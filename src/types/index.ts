@@ -5,6 +5,7 @@ export interface RepairState {
   brokenFilePath: string | null;
   referenceFilePath: string | null;
   hasReferenceFile: boolean;
+  skippedReference: boolean;
   repairProgress: number;
   repairLog: string[];
   repairedFilePath: string | null;

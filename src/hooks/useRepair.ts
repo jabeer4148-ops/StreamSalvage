@@ -15,6 +15,7 @@ type Action =
   | { type: 'SET_BROKEN_FILE'; path: string }
   | { type: 'SET_REFERENCE_FILE'; path: string }
   | { type: 'SKIP_REFERENCE' }
+  | { type: 'UNDO_SKIP_REFERENCE' }
   | { type: 'START_REPAIR' }
   | { type: 'REPAIR_PROGRESS'; progress: number; log: string }
   | { type: 'REPAIR_SUCCESS'; outputPath: string; log: string[] }
@@ -28,6 +29,7 @@ const initialState: RepairState = {
   brokenFilePath: null,
   referenceFilePath: null,
   hasReferenceFile: false,
+  skippedReference: false,
   repairProgress: 0,
   repairLog: [],
   repairedFilePath: null,
@@ -41,9 +43,21 @@ function reducer(state: RepairState, action: Action): RepairState {
     case 'SET_BROKEN_FILE':
       return { ...state, brokenFilePath: action.path, step: 'reference' };
     case 'SET_REFERENCE_FILE':
-      return { ...state, referenceFilePath: action.path, hasReferenceFile: true };
+      return {
+        ...state,
+        referenceFilePath: action.path,
+        hasReferenceFile: true,
+        skippedReference: false,
+      };
     case 'SKIP_REFERENCE':
-      return { ...state, referenceFilePath: null, hasReferenceFile: false };
+      return {
+        ...state,
+        referenceFilePath: null,
+        hasReferenceFile: false,
+        skippedReference: true,
+      };
+    case 'UNDO_SKIP_REFERENCE':
+      return { ...state, skippedReference: false };
     case 'START_REPAIR':
       return { ...state, step: 'repairing', repairProgress: 0, repairLog: [] };
     case 'REPAIR_PROGRESS':
@@ -95,6 +109,10 @@ export function useRepair() {
 
   const skipReference = useCallback(() => {
     dispatch({ type: 'SKIP_REFERENCE' });
+  }, []);
+
+  const undoSkipReference = useCallback(() => {
+    dispatch({ type: 'UNDO_SKIP_REFERENCE' });
   }, []);
 
   const startRepair = useCallback(async () => {
@@ -152,6 +170,7 @@ export function useRepair() {
     selectBrokenFile,
     selectReferenceFile,
     skipReference,
+    undoSkipReference,
     startRepair,
     checkLicense,
     exportFile,
