@@ -1,28 +1,43 @@
-import type { AppStep } from "../types";
+import type { AppStep } from '../types';
 
-interface StepTabsProps {
+const steps: { key: AppStep; label: string }[] = [
+  { key: 'broken', label: 'Broken file' },
+  { key: 'reference', label: 'Reference file' },
+  { key: 'repairing', label: 'Repairing' },
+  { key: 'preview', label: 'Preview' },
+  { key: 'export', label: 'Export' },
+];
+
+const stepOrder: AppStep[] = ['broken', 'reference', 'repairing', 'preview', 'export'];
+
+interface Props {
   currentStep: AppStep;
-  steps: AppStep[];
-  onStepChange: (step: AppStep) => void;
 }
 
-export function StepTabs({ currentStep, steps, onStepChange }: StepTabsProps) {
+export function StepTabs({ currentStep }: Props) {
+  const currentIndex = stepOrder.indexOf(currentStep);
+
   return (
-    <div className="flex gap-2">
-      {steps.map((step) => (
-        <button
-          key={step}
-          type="button"
-          onClick={() => onStepChange(step)}
-          className={
-            currentStep === step
-              ? "rounded bg-blue-600 px-3 py-2 text-sm font-medium text-white"
-              : "rounded bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
-          }
-        >
-          {step}
-        </button>
-      ))}
+    <div className="flex border border-neutral-200 rounded-xl overflow-hidden mb-5">
+      {steps.map((step, i) => {
+        const isDone = i < currentIndex;
+        const isActive = i === currentIndex;
+
+        return (
+          <div
+            key={step.key}
+            className={[
+              'flex-1 py-2 px-3 text-center text-xs font-medium border-r border-neutral-200 last:border-r-0',
+              isDone ? 'bg-white text-[#1D9E75]' : '',
+              isActive ? 'bg-white text-neutral-700' : '',
+              !isDone && !isActive ? 'bg-neutral-50 text-neutral-500' : '',
+            ].join(' ')}
+          >
+            {isDone ? '✓ ' : ''}
+            {step.label}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,18 +1,67 @@
-interface DropZoneProps {
-  label: string;
-  selectedPath: string | null;
-  onSelect: () => void;
+interface Props {
+  variant: 'broken' | 'reference';
+  filePath: string | null;
+  onClick: () => void;
+  disabled?: boolean;
 }
 
-export function DropZone({ label, selectedPath, onSelect }: DropZoneProps) {
+const config = {
+  broken: {
+    borderColor: 'border-[#E24B4A]',
+    bgColor: 'bg-white',
+    filledBorder: 'border-neutral-200',
+    filledBg: 'bg-neutral-50',
+    icon: '🎬',
+    emptyTitle: 'Drop your corrupted recording here',
+    emptySubtitle: 'or click to browse - .mp4, .mov, .m4v supported',
+    filledLabel: 'Corrupted file:',
+    textColor: 'text-[#E24B4A]',
+  },
+  reference: {
+    borderColor: 'border-[#378ADD]',
+    bgColor: 'bg-white',
+    filledBorder: 'border-neutral-200',
+    filledBg: 'bg-neutral-50',
+    icon: '📹',
+    emptyTitle: 'Drop your reference recording here',
+    emptySubtitle: 'Any healthy .mp4 recorded with identical OBS settings',
+    filledLabel: 'Reference file:',
+    textColor: 'text-[#378ADD]',
+  },
+};
+
+export function DropZone({ variant, filePath, onClick, disabled }: Props) {
+  const c = config[variant];
+  const hasFile = !!filePath;
+  const fileName = filePath ? filePath.split('\\').pop()?.split('/').pop() : null;
+
   return (
     <button
       type="button"
-      onClick={onSelect}
-      className="flex w-full flex-col items-center justify-center rounded border border-dashed border-slate-300 bg-white p-6 text-center hover:border-blue-500"
+      onClick={onClick}
+      disabled={disabled}
+      className={[
+        'w-full border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer',
+        'focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#1D9E75]',
+        hasFile
+          ? `${c.filledBorder} ${c.filledBg} border-solid`
+          : `${c.borderColor} ${c.bgColor} hover:bg-neutral-50`,
+        disabled ? 'opacity-50 cursor-not-allowed' : '',
+      ].join(' ')}
     >
-      <span className="text-sm font-semibold text-slate-900">{label}</span>
-      <span className="mt-2 text-xs text-slate-500">{selectedPath ?? "No file selected"}</span>
+      <div className="text-3xl mb-2">{c.icon}</div>
+      {hasFile ? (
+        <>
+          <p className="text-xs text-neutral-500 mb-1">{c.filledLabel}</p>
+          <p className="text-sm font-medium text-neutral-700 truncate max-w-xs mx-auto">{fileName}</p>
+          <p className="text-xs text-neutral-500 mt-1">Click to change</p>
+        </>
+      ) : (
+        <>
+          <p className={`text-sm font-medium ${c.textColor} mb-1`}>{c.emptyTitle}</p>
+          <p className="text-xs text-neutral-500">{c.emptySubtitle}</p>
+        </>
+      )}
     </button>
   );
 }
