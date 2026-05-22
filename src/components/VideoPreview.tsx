@@ -1,12 +1,63 @@
-interface VideoPreviewProps {
-  filePath: string | null;
+interface Props {
+  repairedFilePath: string;
+  onPlayInPlayer: () => void;
+  onProceedToExport: () => void;
 }
 
-export function VideoPreview({ filePath }: VideoPreviewProps) {
+export function VideoPreview({ repairedFilePath, onPlayInPlayer, onProceedToExport }: Props) {
+  const fileName = repairedFilePath.split('\\').pop()?.split('/').pop() ?? 'repaired file';
+
   return (
-    <section className="rounded border border-slate-200 p-4">
-      <h2 className="text-base font-semibold text-slate-900">Preview</h2>
-      <p className="mt-2 text-sm text-slate-600">{filePath ?? "No repaired video available"}</p>
-    </section>
+    <div>
+      <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-2">
+        <span className="text-green-600 text-base mt-0.5" aria-hidden="true">
+          ✓
+        </span>
+        <div>
+          <p className="text-sm font-medium text-green-800">Repair successful</p>
+          <p className="text-xs text-green-600 mt-0.5">
+            Your recording has been recovered. Preview the first 30 seconds below for free,
+            then unlock the full video with a one-time purchase.
+          </p>
+        </div>
+      </div>
+
+      {/* Preview block */}
+      <div className="border border-neutral-200 rounded-xl overflow-hidden mb-4">
+        <div className="flex items-center justify-between px-4 py-2 bg-neutral-50 border-b border-neutral-200">
+          <span className="text-xs text-neutral-500 font-medium">
+            Free preview - first 30 seconds
+          </span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+            🔒 Full video locked
+          </span>
+        </div>
+        <div className="bg-neutral-900 h-28 flex items-center justify-center">
+          <button
+            onClick={onPlayInPlayer}
+            className="flex flex-col items-center gap-2 text-white opacity-80 hover:opacity-100 transition-opacity"
+            aria-label="Play preview in system media player"
+          >
+            <div className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-lg">
+              ▶
+            </div>
+            <span className="text-xs text-white/70">Open in media player</span>
+          </button>
+        </div>
+      </div>
+
+      <p className="text-xs text-neutral-400 text-center mb-3 truncate">Saved to: {fileName}</p>
+
+      <button
+        onClick={onProceedToExport}
+        className="w-full py-2.5 rounded-lg bg-[#1D9E75] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        Unlock full video - $29 one-time →
+      </button>
+
+      <p className="text-xs text-neutral-400 text-center mt-2">
+        No subscription · instant license key via email
+      </p>
+    </div>
   );
 }

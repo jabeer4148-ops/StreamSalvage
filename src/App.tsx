@@ -17,6 +17,7 @@ export default function App() {
     startRepair,
     exportFile,
     previewFile,
+    showExport,
   } = useRepair();
 
   const canStartRepair = state.referenceFilePath !== null || state.skippedReference;
@@ -96,22 +97,31 @@ export default function App() {
       return (
         <section>
           <h2 className="text-sm font-medium text-neutral-700 mb-3">Repairing your recording</h2>
-          <RepairProgress progress={state.repairProgress} log={state.repairLog} />
+          <RepairProgress
+            progress={state.repairProgress}
+            log={state.repairLog}
+            hasReferenceFile={state.hasReferenceFile}
+          />
         </section>
       );
     }
 
     if (state.step === 'preview') {
+      if (!state.repairedFilePath) {
+        return (
+          <section>
+            <p className="text-sm text-neutral-500">No repaired video available yet.</p>
+          </section>
+        );
+      }
+
       return (
-        <section className="space-y-4">
-          <VideoPreview filePath={state.repairedFilePath} />
-          <button
-            type="button"
-            onClick={previewFile}
-            className="w-full py-2.5 rounded-xl text-sm font-medium bg-[#1D9E75] text-white hover:bg-[#188866] transition-colors"
-          >
-            Open Preview
-          </button>
+        <section>
+          <VideoPreview
+            repairedFilePath={state.repairedFilePath}
+            onPlayInPlayer={previewFile}
+            onProceedToExport={showExport}
+          />
         </section>
       );
     }
