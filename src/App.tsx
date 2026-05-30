@@ -5,6 +5,7 @@ import { ReferenceExplainer } from './components/ReferenceExplainer';
 import { NoReferenceWarning } from './components/NoReferenceWarning';
 import { RepairProgress } from './components/RepairProgress';
 import { VideoPreview } from './components/VideoPreview';
+import { ExportPanel } from './components/ExportPanel';
 
 export default function App() {
   const {
@@ -14,6 +15,8 @@ export default function App() {
     skipReference,
     undoSkipReference,
     startRepair,
+    checkLicense,
+    exportFile,
     previewFile,
     showExport,
     reset,
@@ -137,11 +140,18 @@ export default function App() {
       );
     }
 
-    return (
-      <div className="py-4 text-center text-sm text-neutral-500">
-        Export panel coming in next prompt.
-      </div>
-    );
+    if (state.step === 'export') {
+      return (
+        <ExportPanel
+          licenseValid={state.licenseValid}
+          onCheckLicense={checkLicense}
+          onExport={exportFile}
+          onReset={reset}
+        />
+      );
+    }
+
+    return null;
   };
 
   return (

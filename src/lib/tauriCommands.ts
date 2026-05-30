@@ -97,5 +97,6 @@ export async function saveRepairedFile(sourcePath: string, destinationPath: stri
     await invoke('save_repaired_file', { sourcePath, destinationPath });
   } catch (err) {
     console.error('save_repaired_file failed:', err);
+    throw err;
   }
 }

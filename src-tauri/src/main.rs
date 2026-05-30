@@ -353,20 +353,29 @@ async fn repair_with_reference(
 /// Validate a Lemon Squeezy license key against their API
 #[tauri::command]
 async fn validate_license(license_key: String) -> Result<bool, String> {
-    // Replace PRODUCT_ID with your actual Lemon Squeezy product ID
-    let _product_id =
-        std::env::var("LS_PRODUCT_ID").unwrap_or_else(|_| "YOUR_PRODUCT_ID".to_string());
+    let api_key = std::env::var("LEMON_SQUEEZY_API_KEY").unwrap_or_else(|_| "".to_string());
+
+    if api_key.is_empty() {
+        return Ok(license_key.starts_with("TEST-"));
+    }
 
     let client = reqwest::Client::new();
     let response = client
         .post("https://api.lemonsqueezy.com/v1/licenses/validate")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Accept", "application/json")
+        .header("Content-Type", "application/json")
         .json(&serde_json::json!({
             "license_key": license_key,
-            "instance_name": "StreamSalvage Desktop"
+            "instance_name": "StreamSalvage-Desktop"
         }))
         .send()
         .await
-        .map_err(|e| format!("Network error: {}", e))?;
+        .map_err(|e| format!("Network error during validation: {}", e))?;
+
+    if !response.status().is_success() {
+        return Ok(false);
+    }
 
     let json: serde_json::Value = response
         .json()

@@ -224,20 +224,33 @@ export function useRepair() {
     dispatch({ type: 'SHOW_EXPORT' });
   }, []);
 
-  const checkLicense = useCallback(async (key: string) => {
-    const valid = await validateLicense(key);
-    if (valid) {
-      dispatch({ type: 'LICENSE_VALID', key });
-    } else {
+  const checkLicense = useCallback(async (key: string): Promise<boolean> => {
+    try {
+      const valid = await validateLicense(key);
+      if (valid) {
+        dispatch({ type: 'LICENSE_VALID', key });
+      } else {
+        dispatch({ type: 'LICENSE_INVALID' });
+      }
+      return valid;
+    } catch (err) {
+      console.error('License check failed:', err);
       dispatch({ type: 'LICENSE_INVALID' });
+      return false;
     }
-    return valid;
   }, []);
 
   const exportFile = useCallback(async () => {
     if (!state.repairedFilePath) return;
-    const dest = await pickSaveLocation('repaired_recording.mp4');
-    if (dest) await saveRepairedFile(state.repairedFilePath, dest);
+    try {
+      const dest = await pickSaveLocation('repaired_recording.mp4');
+      if (dest) {
+        await saveRepairedFile(state.repairedFilePath, dest);
+      }
+    } catch (err) {
+      console.error('Export failed:', err);
+      throw err;
+    }
   }, [state.repairedFilePath]);
 
   const previewFile = useCallback(async () => {
