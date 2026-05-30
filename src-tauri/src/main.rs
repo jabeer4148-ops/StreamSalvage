@@ -14,28 +14,64 @@ pub struct RepairResult {
 }
 
 fn get_ffmpeg_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
-    let base_path = app
+    let resource_path = app
         .path()
-        .resolve("binaries/ffmpeg", tauri::path::BaseDirectory::Resource)
-        .map_err(|e| format!("FFmpeg binary not found: {}", e))?;
+        .resolve("binaries/ffmpeg", tauri::path::BaseDirectory::Resource);
 
-    if base_path.exists() {
-        return Ok(base_path);
+    if let Ok(path) = resource_path {
+        let with_triple = path.with_file_name("ffmpeg-x86_64-pc-windows-msvc.exe");
+        if with_triple.exists() {
+            return Ok(with_triple.canonicalize().unwrap_or(with_triple));
+        }
+
+        let plain = path.with_extension("exe");
+        if plain.exists() {
+            return Ok(plain.canonicalize().unwrap_or(plain));
+        }
     }
 
-    let windows_path = app
-        .path()
-        .resolve(
-            "binaries/ffmpeg-x86_64-pc-windows-msvc.exe",
-            tauri::path::BaseDirectory::Resource,
-        )
-        .map_err(|e| format!("FFmpeg binary not found: {}", e))?;
+    let cwd_paths = [
+        PathBuf::from("binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+        PathBuf::from("../src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+    ];
 
-    if windows_path.exists() {
-        return Ok(windows_path);
+    for path in cwd_paths {
+        if path.exists() {
+            return Ok(path.canonicalize().unwrap_or(path));
+        }
     }
 
-    Ok(base_path)
+    if let Ok(exe_path) = std::env::current_exe() {
+        let exe_dir = exe_path.parent().unwrap_or(Path::new("."));
+        let exe_relative_paths = [
+            exe_dir.join("binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+            exe_dir.join("ffmpeg-x86_64-pc-windows-msvc.exe"),
+            exe_dir.join("../../binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+            exe_dir.join("../../../binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+            exe_dir.join("../../../../src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe"),
+        ];
+
+        for path in exe_relative_paths {
+            if let Ok(canonical) = path.canonicalize() {
+                if canonical.exists() {
+                    return Ok(canonical);
+                }
+            }
+        }
+    }
+
+    let manifest_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("binaries/ffmpeg-x86_64-pc-windows-msvc.exe");
+    if manifest_path.exists() {
+        return Ok(manifest_path.canonicalize().unwrap_or(manifest_path));
+    }
+
+    Err(
+        "FFmpeg binary not found. Tried multiple locations. Please ensure \
+         src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe exists and Git LFS files are pulled \
+         (run: git lfs pull)"
+            .to_string(),
+    )
 }
 
 fn output_is_valid(output: &Path) -> bool {
@@ -87,6 +123,8 @@ async fn repair_no_reference(
     }
 
     let ffmpeg = get_ffmpeg_path(&app)?;
+    log.push(format!("FFmpeg path resolved: {}", ffmpeg.display()));
+    log.push(format!("FFmpeg exists: {}", ffmpeg.exists()));
     let output = recovered_output_path(&broken_path);
 
     let result = Command::new(&ffmpeg)
@@ -115,7 +153,9 @@ async fn repair_no_reference(
             error: None,
         })
     } else {
-        log.push("Stream copy failed. Try again with a reference file for better results.".to_string());
+        log.push(
+            "Stream copy failed. Try again with a reference file for better results.".to_string(),
+        );
         Ok(RepairResult {
             success: false,
             output_path: None,
@@ -182,6 +222,8 @@ async fn repair_with_reference(
     }
 
     let ffmpeg = get_ffmpeg_path(&app)?;
+    log.push(format!("FFmpeg path resolved: {}", ffmpeg.display()));
+    log.push(format!("FFmpeg exists: {}", ffmpeg.exists()));
     let output = recovered_output_path(&broken_path);
 
     // Step 1: try direct stream copy first (fastest)
