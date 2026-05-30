@@ -28,4 +28,7 @@ dist-ssr
 
 # Knowledge graph (generated, not committed)
 graphify-out/
+
+# Test coverage reports (generated, not committed)
+coverage/
 test_*.mp4
