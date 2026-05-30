@@ -25,3 +25,4 @@ dist-ssr
 
 # Knowledge graph (generated, not committed)
 graphify-out/
+test_*.mp4

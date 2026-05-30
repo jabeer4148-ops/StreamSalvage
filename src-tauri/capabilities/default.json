@@ -5,10 +5,11 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default",
+    "core:path:allow-resolve",
     "shell:allow-execute",
     "shell:allow-open",
     "dialog:allow-open",
-    "core:path:allow-resolve"
+    "dialog:allow-save",
+    "opener:default"
   ]
 }

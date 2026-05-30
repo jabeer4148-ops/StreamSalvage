@@ -1,7 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use tauri::Manager;
 
@@ -14,9 +14,40 @@ pub struct RepairResult {
 }
 
 fn get_ffmpeg_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
-    app.path()
+    let base_path = app
+        .path()
         .resolve("binaries/ffmpeg", tauri::path::BaseDirectory::Resource)
-        .map_err(|e| format!("FFmpeg binary not found: {}", e))
+        .map_err(|e| format!("FFmpeg binary not found: {}", e))?;
+
+    if base_path.exists() {
+        return Ok(base_path);
+    }
+
+    let windows_path = app
+        .path()
+        .resolve(
+            "binaries/ffmpeg-x86_64-pc-windows-msvc.exe",
+            tauri::path::BaseDirectory::Resource,
+        )
+        .map_err(|e| format!("FFmpeg binary not found: {}", e))?;
+
+    if windows_path.exists() {
+        return Ok(windows_path);
+    }
+
+    Ok(base_path)
+}
+
+fn output_is_valid(output: &Path) -> bool {
+    output.exists() && output.metadata().map(|m| m.len()).unwrap_or(0) > 1024
+}
+
+fn recovered_output_path(input_path: &str) -> PathBuf {
+    let input = PathBuf::from(input_path);
+    input.with_file_name(format!(
+        "{}_recovered.mp4",
+        input.file_stem().unwrap_or_default().to_string_lossy()
+    ))
 }
 
 /// Attempt 1: FFmpeg stream copy (no reference file needed, ~40% success)
@@ -26,16 +57,37 @@ async fn repair_no_reference(
     app: tauri::AppHandle,
     broken_path: String,
 ) -> Result<RepairResult, String> {
-    let ffmpeg = get_ffmpeg_path(&app)?;
-    let broken = PathBuf::from(&broken_path);
-    let output = broken.with_file_name(format!(
-        "{}_recovered.mp4",
-        broken.file_stem().unwrap_or_default().to_string_lossy()
-    ));
-
     let mut log = vec![];
     log.push("Starting FFmpeg stream recovery (no reference file)...".to_string());
     log.push("Note: success rate ~40% without reference file.".to_string());
+
+    if !Path::new(&broken_path).exists() {
+        log.push("File not found.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some("File not found".to_string()),
+        });
+    }
+
+    let metadata =
+        std::fs::metadata(&broken_path).map_err(|e| format!("Cannot read file: {}", e))?;
+    if metadata.len() < 1_048_576 {
+        log.push("Input file is under 1MB.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some(
+                "File too small to be a valid recording (under 1MB). Are you sure this is the right file?"
+                    .to_string(),
+            ),
+        });
+    }
+
+    let ffmpeg = get_ffmpeg_path(&app)?;
+    let output = recovered_output_path(&broken_path);
 
     let result = Command::new(&ffmpeg)
         .args([
@@ -54,10 +106,7 @@ async fn repair_no_reference(
     let stderr = String::from_utf8_lossy(&result.stderr).to_string();
     log.push(stderr);
 
-    if result.status.success()
-        && output.exists()
-        && output.metadata().map(|m| m.len()).unwrap_or(0) > 1024
-    {
+    if result.status.success() && output_is_valid(&output) {
         log.push("Recovery successful.".to_string());
         Ok(RepairResult {
             success: true,
@@ -84,15 +133,56 @@ async fn repair_with_reference(
     broken_path: String,
     reference_path: String,
 ) -> Result<RepairResult, String> {
-    let ffmpeg = get_ffmpeg_path(&app)?;
-    let broken = PathBuf::from(&broken_path);
-    let output = broken.with_file_name(format!(
-        "{}_recovered.mp4",
-        broken.file_stem().unwrap_or_default().to_string_lossy()
-    ));
-
     let mut log = vec![];
     log.push("Starting repair with reference file...".to_string());
+
+    if !Path::new(&broken_path).exists() {
+        log.push("Broken file not found.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some("File not found".to_string()),
+        });
+    }
+
+    if !Path::new(&reference_path).exists() {
+        log.push("Reference file not found.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some("Reference file not found".to_string()),
+        });
+    }
+
+    if broken_path == reference_path {
+        log.push("Broken file and reference file are the same file.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some("Broken file and reference file cannot be the same file.".to_string()),
+        });
+    }
+
+    let metadata =
+        std::fs::metadata(&broken_path).map_err(|e| format!("Cannot read file: {}", e))?;
+    if metadata.len() < 1_048_576 {
+        log.push("Broken file is under 1MB.".to_string());
+        return Ok(RepairResult {
+            success: false,
+            output_path: None,
+            log,
+            error: Some(
+                "File too small to be a valid recording (under 1MB). Are you sure this is the right file?"
+                    .to_string(),
+            ),
+        });
+    }
+
+    let ffmpeg = get_ffmpeg_path(&app)?;
+    let output = recovered_output_path(&broken_path);
 
     // Step 1: try direct stream copy first (fastest)
     log.push("Step 1/3: Attempting stream copy...".to_string());
@@ -112,9 +202,12 @@ async fn repair_with_reference(
         .output()
         .map_err(|e| format!("FFmpeg error: {}", e))?;
 
-    let out_exists = output.exists() && output.metadata().map(|m| m.len()).unwrap_or(0) > 1024;
+    let stderr = String::from_utf8_lossy(&step1.stderr).to_string();
+    if !stderr.trim().is_empty() {
+        log.push(stderr);
+    }
 
-    if step1.status.success() && out_exists {
+    if step1.status.success() && output_is_valid(&output) {
         log.push("Stream copy succeeded.".to_string());
         return Ok(RepairResult {
             success: true,
@@ -124,32 +217,11 @@ async fn repair_with_reference(
         });
     }
 
-    // Step 2: Use reference file to extract codec parameters, re-mux broken data
-    log.push("Step 2/3: Extracting codec info from reference file...".to_string());
-    let probe = Command::new(&ffmpeg)
-        .args([
-            "-v",
-            "quiet",
-            "-print_format",
-            "json",
-            "-show_streams",
-            &reference_path,
-        ])
-        .output()
-        .map_err(|e| format!("FFprobe error: {}", e))?;
-
-    if !probe.status.success() {
-        log.push("Could not extract stream metadata from the reference file.".to_string());
-    }
-
-    log.push("Step 3/3: Rebuilding file structure...".to_string());
-
-    // Re-mux with reference container info
-    let step3 = Command::new(&ffmpeg)
+    // Step 2: Use reference file container information to re-map the broken streams.
+    log.push("Step 2/3: Re-mapping broken streams with reference container info...".to_string());
+    let step2 = Command::new(&ffmpeg)
         .args([
             "-y",
-            "-allowed_extensions",
-            "ALL",
             "-i",
             &reference_path,
             "-i",
@@ -167,15 +239,56 @@ async fn repair_with_reference(
             output.to_str().unwrap_or_default(),
         ])
         .output()
-        .map_err(|e| format!("FFmpeg rebuild error: {}", e))?;
+        .map_err(|e| format!("FFmpeg remap error: {}", e))?;
+
+    let stderr = String::from_utf8_lossy(&step2.stderr).to_string();
+    if !stderr.trim().is_empty() {
+        log.push(stderr);
+    }
+
+    if step2.status.success() && output_is_valid(&output) {
+        log.push("Reference remap succeeded.".to_string());
+        return Ok(RepairResult {
+            success: true,
+            output_path: Some(output.to_string_lossy().to_string()),
+            log,
+            error: None,
+        });
+    }
+
+    // Step 3: Fallback repair pass that ignores decode errors and regenerates timestamps.
+    log.push("Step 3/3: Running fallback recovery pass...".to_string());
+    let step3 = Command::new(&ffmpeg)
+        .args([
+            "-y",
+            "-fflags",
+            "+genpts",
+            "-err_detect",
+            "ignore_err",
+            "-i",
+            &broken_path,
+            "-map",
+            "0:v?",
+            "-map",
+            "0:a?",
+            "-c",
+            "copy",
+            "-avoid_negative_ts",
+            "make_zero",
+            "-movflags",
+            "+faststart",
+            output.to_str().unwrap_or_default(),
+        ])
+        .output()
+        .map_err(|e| format!("FFmpeg fallback error: {}", e))?;
 
     let stderr = String::from_utf8_lossy(&step3.stderr).to_string();
-    log.push(stderr);
+    if !stderr.trim().is_empty() {
+        log.push(stderr);
+    }
 
-    let out_exists = output.exists() && output.metadata().map(|m| m.len()).unwrap_or(0) > 1024;
-
-    if out_exists {
-        log.push("Repair complete.".to_string());
+    if step3.status.success() && output_is_valid(&output) {
+        log.push("Fallback recovery succeeded.".to_string());
         Ok(RepairResult {
             success: true,
             output_path: Some(output.to_string_lossy().to_string()),

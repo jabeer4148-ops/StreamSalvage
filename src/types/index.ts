@@ -10,8 +10,10 @@ export interface RepairState {
   repairLog: string[];
   repairedFilePath: string | null;
   repairSuccess: boolean;
+  repairError: string | null;
   licenseKey: string | null;
   licenseValid: boolean;
+  showExport: boolean;
 }
 
 export interface TauriRepairResult {

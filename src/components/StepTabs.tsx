@@ -33,7 +33,7 @@ export function StepTabs({ currentStep }: Props) {
               !isDone && !isActive ? 'bg-neutral-50 text-neutral-500' : '',
             ].join(' ')}
           >
-            {isDone ? '✓ ' : ''}
+            {isDone ? 'Done ' : ''}
             {step.label}
           </div>
         );

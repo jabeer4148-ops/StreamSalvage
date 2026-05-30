@@ -5,7 +5,6 @@ import { ReferenceExplainer } from './components/ReferenceExplainer';
 import { NoReferenceWarning } from './components/NoReferenceWarning';
 import { RepairProgress } from './components/RepairProgress';
 import { VideoPreview } from './components/VideoPreview';
-import { ExportPanel } from './components/ExportPanel';
 
 export default function App() {
   const {
@@ -15,12 +14,13 @@ export default function App() {
     skipReference,
     undoSkipReference,
     startRepair,
-    exportFile,
     previewFile,
     showExport,
+    reset,
   } = useRepair();
 
   const canStartRepair = state.referenceFilePath !== null || state.skippedReference;
+  const brokenFileName = state.brokenFilePath?.split(/[\\/]/).pop() ?? null;
 
   const renderStep = () => {
     if (state.step === 'broken') {
@@ -60,6 +60,18 @@ export default function App() {
             Add a short healthy recording
           </h2>
 
+          {brokenFileName && (
+            <div className="flex items-center justify-between gap-3 bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 mb-4">
+              <span className="text-xs text-neutral-500">Corrupted file:</span>
+              <span
+                className="text-xs font-medium text-neutral-700 truncate"
+                title={state.brokenFilePath ?? undefined}
+              >
+                {brokenFileName}
+              </span>
+            </div>
+          )}
+
           <ReferenceExplainer />
 
           <DropZone
@@ -75,6 +87,12 @@ export default function App() {
               skipped={state.skippedReference}
             />
           </div>
+
+          {state.repairError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+              <p className="text-xs text-red-700">{state.repairError}</p>
+            </div>
+          )}
 
           <button
             type="button"
@@ -101,20 +119,13 @@ export default function App() {
             progress={state.repairProgress}
             log={state.repairLog}
             hasReferenceFile={state.hasReferenceFile}
+            repairError={state.repairError ?? null}
           />
         </section>
       );
     }
 
     if (state.step === 'preview') {
-      if (!state.repairedFilePath) {
-        return (
-          <section>
-            <p className="text-sm text-neutral-500">No repaired video available yet.</p>
-          </section>
-        );
-      }
-
       return (
         <section>
           <VideoPreview
@@ -126,15 +137,34 @@ export default function App() {
       );
     }
 
-    return <ExportPanel repairedFilePath={state.repairedFilePath} onExport={exportFile} />;
+    return (
+      <div className="py-4 text-center text-sm text-neutral-500">
+        Export panel coming in next prompt.
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 font-[system-ui]">
       <div className="w-full max-w-xl bg-white border border-neutral-200 rounded-xl overflow-hidden">
         <div className="px-6 pt-5 pb-4 border-b border-neutral-100">
-          <h1 className="text-base font-semibold text-neutral-700">StreamSalvage</h1>
-          <p className="text-xs text-neutral-500 mt-0.5">MP4 crash recovery - local - no upload</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-base font-semibold text-neutral-700">StreamSalvage</h1>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                MP4 crash recovery - local - no upload
+              </p>
+            </div>
+            {state.step !== 'broken' && (
+              <button
+                type="button"
+                onClick={reset}
+                className="text-xs text-neutral-400 underline underline-offset-2 hover:text-neutral-600"
+              >
+                Start over
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="px-6 py-5">

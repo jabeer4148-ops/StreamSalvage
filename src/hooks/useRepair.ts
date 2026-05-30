@@ -15,10 +15,9 @@ type Action =
   | { type: 'SET_BROKEN_FILE'; path: string }
   | { type: 'SET_REFERENCE_FILE'; path: string }
   | { type: 'SKIP_REFERENCE' }
-  | { type: 'UNDO_SKIP_REFERENCE' }
+  | { type: 'UNDO_SKIP' }
   | { type: 'START_REPAIR' }
-  | { type: 'SET_REPAIR_PROGRESS'; progress: number }
-  | { type: 'REPAIR_PROGRESS'; progress: number; log: string }
+  | { type: 'REPAIR_PROGRESS'; progress: number; log?: string }
   | { type: 'REPAIR_SUCCESS'; outputPath: string; log: string[] }
   | { type: 'REPAIR_FAILED'; error: string; log: string[] }
   | { type: 'SHOW_EXPORT' }
@@ -36,20 +35,23 @@ const initialState: RepairState = {
   repairLog: [],
   repairedFilePath: null,
   repairSuccess: false,
+  repairError: null,
   licenseKey: null,
   licenseValid: false,
+  showExport: false,
 };
 
 function reducer(state: RepairState, action: Action): RepairState {
   switch (action.type) {
     case 'SET_BROKEN_FILE':
-      return { ...state, brokenFilePath: action.path, step: 'reference' };
+      return { ...state, brokenFilePath: action.path, step: 'reference', repairError: null };
     case 'SET_REFERENCE_FILE':
       return {
         ...state,
         referenceFilePath: action.path,
         hasReferenceFile: true,
         skippedReference: false,
+        repairError: null,
       };
     case 'SKIP_REFERENCE':
       return {
@@ -57,18 +59,24 @@ function reducer(state: RepairState, action: Action): RepairState {
         referenceFilePath: null,
         hasReferenceFile: false,
         skippedReference: true,
+        repairError: null,
       };
-    case 'UNDO_SKIP_REFERENCE':
-      return { ...state, skippedReference: false };
+    case 'UNDO_SKIP':
+      return { ...state, skippedReference: false, repairError: null };
     case 'START_REPAIR':
-      return { ...state, step: 'repairing', repairProgress: 0, repairLog: [] };
-    case 'SET_REPAIR_PROGRESS':
-      return { ...state, repairProgress: action.progress };
+      return {
+        ...state,
+        step: 'repairing',
+        repairProgress: 0,
+        repairLog: [],
+        repairError: null,
+        repairSuccess: false,
+      };
     case 'REPAIR_PROGRESS':
       return {
         ...state,
         repairProgress: action.progress,
-        repairLog: [...state.repairLog, action.log],
+        repairLog: action.log ? [...state.repairLog, action.log] : state.repairLog,
       };
     case 'REPAIR_SUCCESS':
       return {
@@ -78,6 +86,7 @@ function reducer(state: RepairState, action: Action): RepairState {
         repairedFilePath: action.outputPath,
         repairLog: [...state.repairLog, ...action.log],
         repairProgress: 100,
+        repairError: null,
       };
     case 'REPAIR_FAILED':
       return {
@@ -86,11 +95,12 @@ function reducer(state: RepairState, action: Action): RepairState {
         repairSuccess: false,
         repairLog: [...state.repairLog, ...action.log],
         repairProgress: 0,
+        repairError: action.error,
       };
     case 'SHOW_EXPORT':
-      return { ...state, step: 'export' };
+      return { ...state, step: 'export', showExport: true };
     case 'LICENSE_VALID':
-      return { ...state, licenseKey: action.key, licenseValid: true, step: 'export' };
+      return { ...state, licenseKey: action.key, licenseValid: true, step: 'export', showExport: true };
     case 'LICENSE_INVALID':
       return { ...state, licenseValid: false };
     case 'RESET':
@@ -103,6 +113,7 @@ function reducer(state: RepairState, action: Action): RepairState {
 export function useRepair() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const repairRunIdRef = useRef(0);
 
   const stopProgressTimer = useCallback(() => {
     if (progressTimerRef.current) {
@@ -128,20 +139,48 @@ export function useRepair() {
   }, []);
 
   const undoSkipReference = useCallback(() => {
-    dispatch({ type: 'UNDO_SKIP_REFERENCE' });
+    dispatch({ type: 'UNDO_SKIP' });
   }, []);
 
   const startRepair = useCallback(async () => {
     if (!state.brokenFilePath) return;
+    const repairRunId = repairRunIdRef.current + 1;
+    repairRunIdRef.current = repairRunId;
     dispatch({ type: 'START_REPAIR' });
     stopProgressTimer();
 
-    const startedAt = Date.now();
-    progressTimerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startedAt;
-      const simulatedProgress = Math.min((elapsed / 3000) * 90, 90);
-      dispatch({ type: 'SET_REPAIR_PROGRESS', progress: simulatedProgress });
+    let simulatedProgress = 0;
+    const progressMessages = [
+      { at: 3, text: 'Launching FFmpeg repair process...' },
+      { at: 30, text: 'Reading damaged MP4 container...' },
+      {
+        at: 60,
+        text: state.hasReferenceFile
+          ? 'Applying reference file stream map...'
+          : 'Attempting stream copy recovery...',
+      },
+      { at: 90, text: 'Waiting for FFmpeg to finish...' },
+    ];
+    const emittedMessages = new Set<number>();
+    const interval = setInterval(() => {
+      if (repairRunIdRef.current !== repairRunId) {
+        clearInterval(interval);
+        return;
+      }
+
+      simulatedProgress = Math.min(simulatedProgress + 3, 90);
+      const message = progressMessages.find(
+        ({ at }) => simulatedProgress >= at && !emittedMessages.has(at),
+      );
+      if (message) emittedMessages.add(message.at);
+
+      dispatch({
+        type: 'REPAIR_PROGRESS',
+        progress: simulatedProgress,
+        log: message?.text,
+      });
     }, 100);
+    progressTimerRef.current = interval;
 
     try {
       const result =
@@ -149,11 +188,11 @@ export function useRepair() {
           ? await repairWithReference(state.brokenFilePath, state.referenceFilePath)
           : await repairNoReference(state.brokenFilePath);
 
+      if (repairRunIdRef.current !== repairRunId) return;
+
       if (result.success && result.output_path) {
-        stopProgressTimer();
         dispatch({ type: 'REPAIR_SUCCESS', outputPath: result.output_path, log: result.log });
       } else {
-        stopProgressTimer();
         dispatch({
           type: 'REPAIR_FAILED',
           error: result.error ?? 'Unknown error',
@@ -161,12 +200,18 @@ export function useRepair() {
         });
       }
     } catch (err) {
-      stopProgressTimer();
+      if (repairRunIdRef.current !== repairRunId) return;
+
       dispatch({
         type: 'REPAIR_FAILED',
         error: String(err),
         log: [String(err)],
       });
+    } finally {
+      clearInterval(interval);
+      if (progressTimerRef.current === interval) {
+        progressTimerRef.current = null;
+      }
     }
   }, [
     state.brokenFilePath,
@@ -196,10 +241,20 @@ export function useRepair() {
   }, [state.repairedFilePath]);
 
   const previewFile = useCallback(async () => {
-    if (state.repairedFilePath) await openFileInPlayer(state.repairedFilePath);
+    if (!state.repairedFilePath) return;
+
+    try {
+      await openFileInPlayer(state.repairedFilePath);
+    } catch (err) {
+      console.error('Preview open failed:', err);
+    }
   }, [state.repairedFilePath]);
 
-  const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
+  const reset = useCallback(() => {
+    repairRunIdRef.current += 1;
+    stopProgressTimer();
+    dispatch({ type: 'RESET' });
+  }, [stopProgressTimer]);
 
   return {
     state,

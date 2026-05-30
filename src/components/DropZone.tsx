@@ -33,8 +33,7 @@ const config = {
 export function DropZone({ variant, filePath, onClick, disabled }: Props) {
   const c = config[variant];
   const hasFile = !!filePath;
-  const fileName = filePath ? filePath.split('\\').pop()?.split('/').pop() : null;
-  const displayedPath = variant === 'reference' ? filePath : fileName;
+  const fileName = filePath ? filePath.split(/[\\/]/).pop() : null;
 
   return (
     <button
@@ -58,7 +57,7 @@ export function DropZone({ variant, filePath, onClick, disabled }: Props) {
             className="text-sm font-medium text-neutral-700 truncate max-w-[40ch] mx-auto"
             title={filePath ?? undefined}
           >
-            {displayedPath}
+            {fileName}
           </p>
           <p className="text-xs text-neutral-500 mt-1">Click to change</p>
         </>

@@ -1,11 +1,27 @@
+import { useEffect, useState } from 'react';
+
 interface Props {
   progress: number;
   log: string[];
   hasReferenceFile: boolean;
+  repairError: string | null;
 }
 
-export function RepairProgress({ progress, log, hasReferenceFile }: Props) {
+export function RepairProgress({ progress, log, hasReferenceFile, repairError }: Props) {
   const displayProgress = Math.min(Math.max(Math.round(progress), 0), 100);
+  const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
+
+  useEffect(() => {
+    setShowLongWaitMessage(false);
+
+    if (progress >= 100 || repairError) return undefined;
+
+    const timeout = setTimeout(() => {
+      setShowLongWaitMessage(true);
+    }, 60000);
+
+    return () => clearTimeout(timeout);
+  }, [progress, repairError]);
 
   return (
     <div className="py-2">
@@ -18,15 +34,29 @@ export function RepairProgress({ progress, log, hasReferenceFile }: Props) {
       <div className="w-full bg-neutral-100 rounded-full h-2 mb-4">
         <div
           className="bg-[#1D9E75] h-2 rounded-full transition-all duration-300"
-          style={{ width: `${displayProgress}%` }}
+          style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>
+
+      {showLongWaitMessage && progress < 100 && (
+        <div className="bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 mb-4">
+          <p className="text-xs text-neutral-600">
+            Still working... Large files can take a few minutes.
+          </p>
+        </div>
+      )}
 
       {!hasReferenceFile && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
           <p className="text-xs text-amber-700">
             Running without reference file - if this fails, try again with one.
           </p>
+        </div>
+      )}
+
+      {repairError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+          <p className="text-xs text-red-700">{repairError}</p>
         </div>
       )}
 
