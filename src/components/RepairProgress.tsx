@@ -34,7 +34,7 @@ export function RepairProgress({ progress, log, hasReferenceFile, repairError }:
       <div className="w-full bg-neutral-100 rounded-full h-2 mb-4">
         <div
           className="bg-[#1D9E75] h-2 rounded-full transition-all duration-300"
-          style={{ width: `${Math.min(progress, 100)}%` }}
+          style={{ width: `${Math.max(0, Math.min(progress, 100))}%` }}
         />
       </div>
 

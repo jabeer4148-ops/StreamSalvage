@@ -11,7 +11,7 @@ import {
   saveRepairedFile,
 } from '../lib/tauriCommands';
 
-type Action =
+export type Action =
   | { type: 'SET_BROKEN_FILE'; path: string }
   | { type: 'SET_REFERENCE_FILE'; path: string }
   | { type: 'SKIP_REFERENCE' }
@@ -25,7 +25,7 @@ type Action =
   | { type: 'LICENSE_INVALID' }
   | { type: 'RESET' };
 
-const initialState: RepairState = {
+export const initialState: RepairState = {
   step: 'broken',
   brokenFilePath: null,
   referenceFilePath: null,
@@ -41,7 +41,7 @@ const initialState: RepairState = {
   showExport: false,
 };
 
-function reducer(state: RepairState, action: Action): RepairState {
+export function reducer(state: RepairState, action: Action): RepairState {
   switch (action.type) {
     case 'SET_BROKEN_FILE':
       return { ...state, brokenFilePath: action.path, step: 'reference', repairError: null };
