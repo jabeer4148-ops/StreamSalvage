@@ -353,13 +353,32 @@ async fn repair_with_reference(
 /// Validate a Lemon Squeezy license key against their API
 #[tauri::command]
 async fn validate_license(license_key: String) -> Result<bool, String> {
-    let api_key = std::env::var("LEMON_SQUEEZY_API_KEY").unwrap_or_else(|_| "".to_string());
+    // option_env!() reads the value embedded at compile time via build.rs.
+    // std::env::var() would read the runtime process env and miss the
+    // embedded key, leaving the dev bypass permanently active in release builds.
+    let api_key = option_env!("LEMON_SQUEEZY_API_KEY").unwrap_or("");
 
     if api_key.is_empty() {
-        return Ok(license_key.starts_with("TEST-"));
+        // Only allow TEST- bypass in debug builds.
+        // Release builds with no embedded key are a configuration error —
+        // return Err so the UI shows a support message rather than silently
+        // accepting any key.
+        if cfg!(debug_assertions) {
+            return Ok(license_key.starts_with("TEST-"));
+        } else {
+            return Err(
+                "License validation is not configured. \
+                 Please contact support@streamsalvage.com"
+                    .to_string(),
+            );
+        }
     }
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("HTTP client error: {}", e))?;
+
     let response = client
         .post("https://api.lemonsqueezy.com/v1/licenses/validate")
         .header("Authorization", format!("Bearer {}", api_key))
@@ -371,7 +390,7 @@ async fn validate_license(license_key: String) -> Result<bool, String> {
         }))
         .send()
         .await
-        .map_err(|e| format!("Network error during validation: {}", e))?;
+        .map_err(|e| format!("Network error: {}", e))?;
 
     if !response.status().is_success() {
         return Ok(false);
@@ -380,7 +399,7 @@ async fn validate_license(license_key: String) -> Result<bool, String> {
     let json: serde_json::Value = response
         .json()
         .await
-        .map_err(|e| format!("Parse error: {}", e))?;
+        .map_err(|e| format!("Response parse error: {}", e))?;
 
     Ok(json["valid"].as_bool().unwrap_or(false))
 }
