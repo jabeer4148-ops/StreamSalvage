@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>A Simple untrunc Alternative for Repairing MP4 Files</title>
+  <meta name="description" content="untrunc repairs broken MP4 files from the command line. Here's how it works, and a drag-and-drop alternative that does the same reference-based repair." />
+  <link rel="canonical" href="https://streamsalvage.com/guides/untrunc-alternative/" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://streamsalvage.com/guides/untrunc-alternative/" />
+  <meta property="og:title" content="A Simple untrunc Alternative for Repairing MP4 Files" />
+  <meta property="og:description" content="How untrunc repairs corrupted MP4 files, and a drag-and-drop alternative that does the same reference-based repair without the command line." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="A Simple untrunc Alternative for Repairing MP4 Files" />
+  <meta name="twitter:description" content="The same reference-based MP4 repair as untrunc, without the command line." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "A Simple untrunc Alternative for Repairing MP4 Files",
+    "description": "How untrunc repairs corrupted MP4 files, and a drag-and-drop alternative that does the same reference-based repair without the command line.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://streamsalvage.com" },
+    "datePublished": "2026-06-13",
+    "dateModified": "2026-06-13",
+    "mainEntityOfPage": "https://streamsalvage.com/guides/untrunc-alternative/"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://streamsalvage.com/guides/" },
+      { "@type": "ListItem", "position": 3, "name": "untrunc alternative", "item": "https://streamsalvage.com/guides/untrunc-alternative/" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does untrunc do?",
+        "acceptedAnswer": { "@type": "Answer", "text": "untrunc is a free, open-source tool that repairs truncated or unfinalized MP4 and MOV files. It uses a healthy reference video recorded with the same settings to rebuild the missing moov atom in a broken file, making it playable again." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a GUI version of untrunc?",
+        "acceptedAnswer": { "@type": "Answer", "text": "There is a community untrunc-gui project, but it can be hard to build and is no longer actively maintained for newer systems. If you want a maintained drag-and-drop experience, StreamSalvage performs the same reference-based repair with a graphical interface and a free preview." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is untrunc safe to use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "untrunc runs locally and does not upload your files, which makes it safe from a privacy standpoint. The main hurdles are compiling it and using the command line correctly. StreamSalvage keeps the same local-only privacy while removing the build and terminal steps." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do untrunc and StreamSalvage repair files the same way?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Both use the same core idea: a clean reference clip recorded with matching settings supplies the metadata needed to rebuild a broken MP4. StreamSalvage adds a free preview so you can confirm the repair worked before paying, and a guided workflow for recording the reference." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides/">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>untrunc alternative</span>
+      </nav>
+
+      <p class="eyebrow">Tool comparison</p>
+      <h1>A simpler untrunc alternative for repairing broken MP4 files</h1>
+      <p class="meta">Last updated June 13, 2026 · ~5 min read</p>
+
+      <p class="lead">If you've searched for how to fix a truncated or unfinalized MP4, you've probably run into <code>untrunc</code>. It genuinely works — but it's a command-line tool you have to compile yourself, and that stops a lot of people in their tracks. This guide explains what untrunc does, when it's the right choice, and a drag-and-drop alternative that uses the same repair method.</p>
+
+      <h2>What untrunc actually does</h2>
+      <p>untrunc is a free, open-source tool that repairs MP4 and MOV files whose <strong>moov atom</strong> — the index a player needs to read the file — was never written. This is exactly what happens when a recorder like OBS crashes before finalizing a recording.</p>
+      <p>Its clever trick is using a <em>reference file</em>: a healthy video recorded with the same device and settings. Because that reference contains a correctly written moov atom, untrunc can use it as a template to rebuild the missing index in your broken file. The footage was never gone — it just had no map.</p>
+      <div class="callout">
+        <p>If you want the full explanation of why recordings corrupt this way, see our guide on <a href="/guides/fix-corrupted-obs-recording/">fixing a corrupted OBS recording</a>.</p>
+      </div>
+
+      <h2>Where untrunc gets hard</h2>
+      <p>The repair logic is solid; the friction is everything around it:</p>
+      <ul>
+        <li><strong>You have to build it.</strong> There's no official installer for most platforms — you compile from source or hunt for an unofficial binary.</li>
+        <li><strong>It's command-line only.</strong> You pass the reference and broken file as terminal arguments, with no visual feedback.</li>
+        <li><strong>The GUI fork is unmaintained.</strong> The community <code>untrunc-gui</code> exists but is difficult to get running on current systems.</li>
+        <li><strong>No preview.</strong> You don't know whether the repair worked until you open the output and hope.</li>
+      </ul>
+      <p>For a developer comfortable in a terminal, none of this is a dealbreaker. For a streamer who just wants their VOD back, it's a wall.</p>
+
+      <h2>untrunc vs. StreamSalvage at a glance</h2>
+      <table aria-label="untrunc compared with StreamSalvage">
+        <thead><tr><th scope="col">untrunc (CLI)</th><th scope="col">StreamSalvage</th></tr></thead>
+        <tbody>
+          <tr><td>Compile from source</td><td>Download and run</td></tr>
+          <tr><td>Terminal commands</td><td>Drag and drop</td></tr>
+          <tr><td>No repair preview</td><td>Free preview before you pay</td></tr>
+          <tr><td>Manual reference setup</td><td>Guided 10-second reference clip</td></tr>
+          <tr><td>Local &amp; private</td><td>Local &amp; private</td></tr>
+          <tr><td>Free</td><td>$29 one-time to export</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Which one should you use?</h2>
+      <p><strong>Use untrunc</strong> if you're technical, comfortable building software, and don't mind the command line — it's free and it works.</p>
+      <p><strong>Use StreamSalvage</strong> if you'd rather drop in your file, follow a guided prompt to record the reference clip, and see the repaired result before paying anything. It performs the same reference-based repair, stays 100% local so your footage never uploads, and skips the build-and-terminal steps entirely.</p>
+
+      <div class="cta-box">
+        <h3>Same repair, no command line</h3>
+        <p>Drop in your broken MP4, record a quick reference clip with the guided steps, and preview the repair for free. Pay $29 only if it works.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What does untrunc do?</summary>
+          <p>untrunc is a free, open-source tool that repairs truncated or unfinalized MP4 and MOV files. It uses a healthy reference video recorded with the same settings to rebuild the missing moov atom in a broken file, making it playable again.</p>
+        </details>
+        <details>
+          <summary>Is there a GUI version of untrunc?</summary>
+          <p>There is a community untrunc-gui project, but it can be hard to build and is no longer actively maintained for newer systems. If you want a maintained drag-and-drop experience, StreamSalvage performs the same reference-based repair with a graphical interface and a free preview.</p>
+        </details>
+        <details>
+          <summary>Is untrunc safe to use?</summary>
+          <p>untrunc runs locally and does not upload your files, which makes it safe from a privacy standpoint. The main hurdles are compiling it and using the command line correctly. StreamSalvage keeps the same local-only privacy while removing the build and terminal steps.</p>
+        </details>
+        <details>
+          <summary>Do untrunc and StreamSalvage repair files the same way?</summary>
+          <p>Both use the same core idea: a clean reference clip recorded with matching settings supplies the metadata needed to rebuild a broken MP4. StreamSalvage adds a free preview so you can confirm the repair worked before paying, and a guided workflow for recording the reference.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/fix-corrupted-obs-recording/">How to fix a corrupted OBS recording →</a>
+        <a href="/guides/repair-mp4-without-uploading/">How to repair an MP4 without uploading it anywhere →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides/">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>
+                         
