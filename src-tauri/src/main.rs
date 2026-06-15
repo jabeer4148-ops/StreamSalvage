@@ -406,29 +406,20 @@ async fn repair_with_reference(
     }
 }
 
-/// Validate a Lemon Squeezy license key against their API
+/// Validate a StreamSalvage license key against the landing API.
 #[tauri::command]
 async fn validate_license(license_key: String) -> Result<bool, String> {
-    // option_env!() reads the value embedded at compile time via build.rs.
-    // std::env::var() would read the runtime process env and miss the
-    // embedded key, leaving the dev bypass permanently active in release builds.
-    let api_key = option_env!("LEMON_SQUEEZY_API_KEY").unwrap_or("");
+    let configured_endpoint = option_env!("STREAMSALVAGE_LICENSE_API_URL").unwrap_or("");
 
-    if api_key.is_empty() {
-        // Only allow TEST- bypass in debug builds.
-        // Release builds with no embedded key are a configuration error —
-        // return Err so the UI shows a support message rather than silently
-        // accepting any key.
-        if cfg!(debug_assertions) {
-            return Ok(license_key.starts_with("TEST-"));
-        } else {
-            return Err(
-                "License validation is not configured. \
-                 Please contact support@streamsalvage.com"
-                    .to_string(),
-            );
-        }
+    if cfg!(debug_assertions) && configured_endpoint.is_empty() {
+        return Ok(license_key.starts_with("TEST-"));
     }
+
+    let endpoint = if configured_endpoint.is_empty() {
+        "https://streamsalvage.com/api/validate-license"
+    } else {
+        configured_endpoint
+    };
 
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(15))
@@ -436,13 +427,11 @@ async fn validate_license(license_key: String) -> Result<bool, String> {
         .map_err(|e| format!("HTTP client error: {}", e))?;
 
     let response = client
-        .post("https://api.lemonsqueezy.com/v1/licenses/validate")
-        .header("Authorization", format!("Bearer {}", api_key))
+        .post(endpoint)
         .header("Accept", "application/json")
         .header("Content-Type", "application/json")
         .json(&serde_json::json!({
-            "license_key": license_key,
-            "instance_name": "StreamSalvage-Desktop"
+            "licenseKey": license_key
         }))
         .send()
         .await

@@ -33,7 +33,7 @@ export function ExportPanel({
         setExportStep('ready');
       } else {
         setError(
-          'License key not recognized. Check your purchase email from Lemon Squeezy. ' +
+          'License key not recognized. Check your StreamSalvage purchase email. ' +
             'Keys look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
         );
       }
@@ -94,7 +94,7 @@ export function ExportPanel({
           <p className="text-xs text-amber-700 leading-relaxed">
             Enter the license key from your purchase email. Don't have one?{' '}
             <a
-              href="https://streamsalvage.lemonsqueezy.com/buy/"
+              href="https://streamsalvage.com/#download"
               className="underline text-amber-800 font-medium"
               target="_blank"
               rel="noopener noreferrer"

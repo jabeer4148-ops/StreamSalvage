@@ -29,7 +29,7 @@ describe('ExportPanel', () => {
     render(<ExportPanel {...mockProps} />);
     const link = screen.getByRole('link', { name: /Buy for \$29/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://streamsalvage.lemonsqueezy.com/buy/');
+    expect(link).toHaveAttribute('href', 'https://streamsalvage.com/#download');
   });
 
   test('verify button is disabled when input is empty', () => {

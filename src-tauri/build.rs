@@ -1,6 +1,6 @@
 fn main() {
-    if let Ok(key) = std::env::var("LEMON_SQUEEZY_API_KEY") {
-        println!("cargo:rustc-env=LEMON_SQUEEZY_API_KEY={}", key);
+    if let Ok(endpoint) = std::env::var("STREAMSALVAGE_LICENSE_API_URL") {
+        println!("cargo:rustc-env=STREAMSALVAGE_LICENSE_API_URL={}", endpoint);
     }
     tauri_build::build()
 }
