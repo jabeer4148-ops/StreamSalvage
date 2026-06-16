@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 
 // Must mock before importing the hook
 vi.mock('@tauri-apps/api/core', () => ({ invoke: vi.fn() }));
@@ -13,6 +13,9 @@ vi.mock('../lib/tauriCommands', () => ({
   repairNoReference: vi.fn(),
   repairWithReference: vi.fn(),
   validateLicense: vi.fn(),
+  getStoredLicense: vi.fn(),
+  saveStoredLicense: vi.fn(),
+  clearStoredLicense: vi.fn(),
   openFileInPlayer: vi.fn(),
   saveRepairedFile: vi.fn(),
 }));
@@ -26,6 +29,9 @@ const mockPickSave = vi.mocked(cmd.pickSaveLocation);
 const mockRepairNoRef = vi.mocked(cmd.repairNoReference);
 const mockRepairWithRef = vi.mocked(cmd.repairWithReference);
 const mockValidate = vi.mocked(cmd.validateLicense);
+const mockGetStoredLicense = vi.mocked(cmd.getStoredLicense);
+const mockSaveStoredLicense = vi.mocked(cmd.saveStoredLicense);
+const mockClearStoredLicense = vi.mocked(cmd.clearStoredLicense);
 const mockOpenPlayer = vi.mocked(cmd.openFileInPlayer);
 const mockSaveFile = vi.mocked(cmd.saveRepairedFile);
 
@@ -46,6 +52,9 @@ const FAILURE_RESULT = {
 describe('useRepair hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetStoredLicense.mockResolvedValue(null);
+    mockSaveStoredLicense.mockResolvedValue(undefined);
+    mockClearStoredLicense.mockResolvedValue(undefined);
   });
 
   // ── selectBrokenFile ──────────────────────────────────────────────────
@@ -269,6 +278,28 @@ describe('useRepair hook', () => {
     expect(result.current.state.licenseValid).toBe(true);
     expect(result.current.state.licenseKey).toBe('TEST-1234');
     expect(result.current.state.step).toBe('export');
+    expect(mockSaveStoredLicense).toHaveBeenCalledWith('TEST-1234');
+  });
+
+  test('startup: validates stored license silently and marks it valid', async () => {
+    mockGetStoredLicense.mockResolvedValue('TEST-1234');
+    mockValidate.mockResolvedValue(true);
+
+    const { result } = renderHook(() => useRepair());
+
+    await waitFor(() => expect(result.current.state.licenseValid).toBe(true));
+    expect(result.current.state.licenseKey).toBe('TEST-1234');
+    expect(result.current.state.step).toBe('broken');
+  });
+
+  test('startup: clears stored license when API rejects it', async () => {
+    mockGetStoredLicense.mockResolvedValue('BAD-KEY');
+    mockValidate.mockResolvedValue(false);
+
+    const { result } = renderHook(() => useRepair());
+
+    await waitFor(() => expect(mockClearStoredLicense).toHaveBeenCalledOnce());
+    expect(result.current.state.licenseValid).toBe(false);
   });
 
   test('checkLicense: invalid key sets licenseValid to false', async () => {

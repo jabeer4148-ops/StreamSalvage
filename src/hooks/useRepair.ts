@@ -7,6 +7,9 @@ import {
   repairNoReference,
   repairWithReference,
   validateLicense,
+  getStoredLicense,
+  saveStoredLicense,
+  clearStoredLicense,
   openFileInPlayer,
   saveRepairedFile,
 } from '../lib/tauriCommands';
@@ -22,7 +25,9 @@ export type Action =
   | { type: 'REPAIR_FAILED'; error: string; log: string[] }
   | { type: 'SHOW_EXPORT' }
   | { type: 'LICENSE_VALID'; key: string }
+  | { type: 'STORED_LICENSE_VALID'; key: string }
   | { type: 'LICENSE_INVALID' }
+  | { type: 'CLEAR_LICENSE' }
   | { type: 'RESET' };
 
 export const initialState: RepairState = {
@@ -101,10 +106,18 @@ export function reducer(state: RepairState, action: Action): RepairState {
       return { ...state, step: 'export', showExport: true };
     case 'LICENSE_VALID':
       return { ...state, licenseKey: action.key, licenseValid: true, step: 'export', showExport: true };
+    case 'STORED_LICENSE_VALID':
+      return { ...state, licenseKey: action.key, licenseValid: true };
     case 'LICENSE_INVALID':
       return { ...state, licenseValid: false };
+    case 'CLEAR_LICENSE':
+      return { ...state, licenseKey: null, licenseValid: false };
     case 'RESET':
-      return { ...initialState };
+      return {
+        ...initialState,
+        licenseKey: state.licenseKey,
+        licenseValid: state.licenseValid,
+      };
     default:
       return state;
   }
@@ -123,6 +136,35 @@ export function useRepair() {
   }, []);
 
   useEffect(() => stopProgressTimer, [stopProgressTimer]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function validateStoredLicense() {
+      try {
+        const storedLicense = await getStoredLicense();
+        if (!storedLicense || cancelled) return;
+
+        const valid = await validateLicense(storedLicense);
+        if (cancelled) return;
+
+        if (valid) {
+          dispatch({ type: 'STORED_LICENSE_VALID', key: storedLicense });
+        } else {
+          await clearStoredLicense();
+          if (!cancelled) dispatch({ type: 'CLEAR_LICENSE' });
+        }
+      } catch (err) {
+        console.error('Stored license check failed:', err);
+      }
+    }
+
+    void validateStoredLicense();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const selectBrokenFile = useCallback(async () => {
     const path = await pickBrokenFile();
@@ -228,6 +270,7 @@ export function useRepair() {
     try {
       const valid = await validateLicense(key);
       if (valid) {
+        await saveStoredLicense(key);
         dispatch({ type: 'LICENSE_VALID', key });
       } else {
         dispatch({ type: 'LICENSE_INVALID' });
@@ -238,6 +281,11 @@ export function useRepair() {
       dispatch({ type: 'LICENSE_INVALID' });
       return false;
     }
+  }, []);
+
+  const changeLicense = useCallback(async () => {
+    await clearStoredLicense();
+    dispatch({ type: 'CLEAR_LICENSE' });
   }, []);
 
   const exportFile = useCallback(async () => {
@@ -277,6 +325,7 @@ export function useRepair() {
     undoSkipReference,
     startRepair,
     checkLicense,
+    changeLicense,
     exportFile,
     previewFile,
     showExport,

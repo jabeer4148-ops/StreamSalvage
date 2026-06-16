@@ -200,6 +200,14 @@ describe('useRepair reducer', () => {
     expect(next.showExport).toBe(true);
   });
 
+  test('STORED_LICENSE_VALID sets key without changing current step', () => {
+    const next = reducer(state, { type: 'STORED_LICENSE_VALID', key: 'TEST-1234' });
+    expect(next.licenseKey).toBe('TEST-1234');
+    expect(next.licenseValid).toBe(true);
+    expect(next.step).toBe('broken');
+    expect(next.showExport).toBe(false);
+  });
+
   // ── LICENSE_INVALID ───────────────────────────────────────────────────
 
   test('LICENSE_INVALID sets licenseValid to false', () => {
@@ -210,9 +218,16 @@ describe('useRepair reducer', () => {
     expect(next.licenseKey).toBe('TEST-1234');
   });
 
+  test('CLEAR_LICENSE clears key and valid flag', () => {
+    state = reducer(state, { type: 'LICENSE_VALID', key: 'TEST-1234' });
+    const next = reducer(state, { type: 'CLEAR_LICENSE' });
+    expect(next.licenseValid).toBe(false);
+    expect(next.licenseKey).toBeNull();
+  });
+
   // ── RESET ─────────────────────────────────────────────────────────────
 
-  test('RESET returns to exact initialState', () => {
+  test('RESET returns to initial repair state and preserves license status', () => {
     // Dirty the state fully
     state = reducer(state, { type: 'SET_BROKEN_FILE', path: 'broken.mp4' });
     state = reducer(state, { type: 'SET_REFERENCE_FILE', path: 'ref.mp4' });
@@ -225,8 +240,11 @@ describe('useRepair reducer', () => {
     state = reducer(state, { type: 'LICENSE_VALID', key: 'TEST-XXXX' });
 
     const reset = reducer(state, { type: 'RESET' });
-    // Every field must match initialState exactly
-    expect(reset).toStrictEqual(initialState);
+    expect(reset).toStrictEqual({
+      ...initialState,
+      licenseKey: 'TEST-XXXX',
+      licenseValid: true,
+    });
   });
 
   // ── In-flight repair guard ────────────────────────────────────────────

@@ -13,6 +13,71 @@ pub struct RepairResult {
     pub error: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct StoredLicense {
+    #[serde(rename = "licenseKey")]
+    license_key: String,
+}
+
+fn license_file_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(appdata) = std::env::var_os("APPDATA") {
+            return Ok(PathBuf::from(appdata)
+                .join("StreamSalvage")
+                .join("license.json"));
+        }
+    }
+
+    app.path()
+        .data_dir()
+        .map(|dir| dir.join("StreamSalvage").join("license.json"))
+        .map_err(|e| format!("Could not resolve app data directory: {}", e))
+}
+
+fn read_license_file(path: &Path) -> Result<Option<String>, String> {
+    if !path.exists() {
+        return Ok(None);
+    }
+
+    let contents = std::fs::read_to_string(path)
+        .map_err(|e| format!("Could not read stored license: {}", e))?;
+    let stored: StoredLicense = serde_json::from_str(&contents)
+        .map_err(|e| format!("Could not parse stored license: {}", e))?;
+    let license_key = stored.license_key.trim().to_string();
+
+    if license_key.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(license_key))
+    }
+}
+
+fn write_license_file(path: &Path, license_key: &str) -> Result<(), String> {
+    let license_key = license_key.trim().to_string();
+    if license_key.is_empty() {
+        return Err("License key cannot be empty".to_string());
+    }
+
+    let parent = path
+        .parent()
+        .ok_or_else(|| "Could not resolve license directory".to_string())?;
+    std::fs::create_dir_all(parent)
+        .map_err(|e| format!("Could not create license directory: {}", e))?;
+
+    let contents = serde_json::to_string_pretty(&StoredLicense { license_key })
+        .map_err(|e| format!("Could not serialize license: {}", e))?;
+    std::fs::write(path, contents).map_err(|e| format!("Could not write stored license: {}", e))
+}
+
+fn remove_license_file(path: &Path) -> Result<(), String> {
+    if path.exists() {
+        std::fs::remove_file(path)
+            .map_err(|e| format!("Could not remove stored license: {}", e))?;
+    }
+    Ok(())
+}
+
 fn get_ffmpeg_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let resource_path = app
         .path()
@@ -131,8 +196,7 @@ async fn repair_no_reference(
             output_path: None,
             log,
             error: Some(
-                "Unsupported file type. Only .mp4, .mov, and .m4v files are supported."
-                    .to_string(),
+                "Unsupported file type. Only .mp4, .mov, and .m4v files are supported.".to_string(),
             ),
         });
     }
@@ -243,8 +307,7 @@ async fn repair_with_reference(
             output_path: None,
             log,
             error: Some(
-                "Unsupported file type. Only .mp4, .mov, and .m4v files are supported."
-                    .to_string(),
+                "Unsupported file type. Only .mp4, .mov, and .m4v files are supported.".to_string(),
             ),
         });
     }
@@ -449,6 +512,24 @@ async fn validate_license(license_key: String) -> Result<bool, String> {
     Ok(json["valid"].as_bool().unwrap_or(false))
 }
 
+#[tauri::command]
+async fn get_stored_license(app: tauri::AppHandle) -> Result<Option<String>, String> {
+    let path = license_file_path(&app)?;
+    read_license_file(&path)
+}
+
+#[tauri::command]
+async fn save_stored_license(app: tauri::AppHandle, license_key: String) -> Result<(), String> {
+    let path = license_file_path(&app)?;
+    write_license_file(&path, &license_key)
+}
+
+#[tauri::command]
+async fn clear_stored_license(app: tauri::AppHandle) -> Result<(), String> {
+    let path = license_file_path(&app)?;
+    remove_license_file(&path)
+}
+
 /// Open file in system default player (for preview)
 #[tauri::command]
 async fn open_file_in_player(path: String) -> Result<(), String> {
@@ -476,6 +557,9 @@ fn main() {
             repair_no_reference,
             repair_with_reference,
             validate_license,
+            get_stored_license,
+            save_stored_license,
+            clear_stored_license,
             open_file_in_player,
             save_repaired_file,
         ])
@@ -507,12 +591,9 @@ mod tests {
                 ext
             ));
         }
-        let metadata =
-            std::fs::metadata(path).map_err(|e| format!("Cannot read file: {}", e))?;
+        let metadata = std::fs::metadata(path).map_err(|e| format!("Cannot read file: {}", e))?;
         if metadata.len() < 1_048_576 {
-            return Err(
-                "File too small to be a valid recording (under 1MB).".to_string(),
-            );
+            return Err("File too small to be a valid recording (under 1MB).".to_string());
         }
         Ok(())
     }
@@ -535,7 +616,10 @@ mod tests {
         };
         let json = serde_json::to_string(&result).unwrap();
         assert!(json.contains("\"success\":true"), "missing success:true");
-        assert!(json.contains("\"output_path\":\"test.mp4\""), "missing output_path");
+        assert!(
+            json.contains("\"output_path\":\"test.mp4\""),
+            "missing output_path"
+        );
         assert!(json.contains("\"error\":null"), "error should be null");
     }
 
@@ -617,7 +701,10 @@ mod tests {
         let mut tmp = tempfile::Builder::new().suffix(".txt").tempfile().unwrap();
         tmp.write_all(&vec![0u8; 2 * 1024 * 1024]).unwrap();
         let result = validate_input_file(tmp.path().to_str().unwrap());
-        assert!(result.is_err(), "should reject .txt files even if large enough");
+        assert!(
+            result.is_err(),
+            "should reject .txt files even if large enough"
+        );
         let msg = result.unwrap_err().to_lowercase();
         assert!(
             msg.contains("unsupported") || msg.contains("extension"),
@@ -701,7 +788,11 @@ mod tests {
         let second_path = second.path().to_path_buf();
         let candidates = vec![first_path.clone(), second_path];
         let result = find_ffmpeg_in_paths(&candidates);
-        assert_eq!(result.unwrap(), first_path, "should return first existing path");
+        assert_eq!(
+            result.unwrap(),
+            first_path,
+            "should return first existing path"
+        );
     }
 
     // ── TEST GROUP 4: Output path generation (generate_output_path) ───────
@@ -734,7 +825,10 @@ mod tests {
     fn test_output_path_deterministic_when_no_collision() {
         let output1 = generate_output_path(Path::new("/tmp/stream.mp4"));
         let output2 = generate_output_path(Path::new("/tmp/stream.mp4"));
-        assert_eq!(output1, output2, "same input → same output when no collision");
+        assert_eq!(
+            output1, output2,
+            "same input → same output when no collision"
+        );
     }
 
     #[test]
@@ -745,7 +839,11 @@ mod tests {
         // First call: no existing file → returns base
         let first = generate_output_path(&input_path);
         let first_name = first.file_name().unwrap().to_string_lossy();
-        assert!(first_name.ends_with("_recovered.mp4"), "first: {}", first_name);
+        assert!(
+            first_name.ends_with("_recovered.mp4"),
+            "first: {}",
+            first_name
+        );
 
         // Create the collision file
         std::fs::write(&first, b"dummy").unwrap();
@@ -903,5 +1001,29 @@ mod tests {
     async fn test_dev_fallback_test_prefix_only_at_start() {
         let result = validate_license("SUFFIX-TEST-1234".to_string()).await;
         assert_eq!(result, Ok(false));
+    }
+
+    #[test]
+    fn test_license_file_round_trips_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("StreamSalvage").join("license.json");
+
+        write_license_file(&path, "  TEST-1234  ").unwrap();
+
+        assert!(path.exists(), "license.json should be created on disk");
+        let stored = read_license_file(&path).unwrap();
+        assert_eq!(stored, Some("TEST-1234".to_string()));
+    }
+
+    #[test]
+    fn test_license_file_clear_removes_saved_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("StreamSalvage").join("license.json");
+
+        write_license_file(&path, "TEST-1234").unwrap();
+        remove_license_file(&path).unwrap();
+
+        assert!(!path.exists(), "license.json should be removed");
+        assert_eq!(read_license_file(&path).unwrap(), None);
     }
 }

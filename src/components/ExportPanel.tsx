@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   licenseValid: boolean;
   onCheckLicense: (key: string) => Promise<boolean>;
+  onChangeLicense: () => Promise<void> | void;
   onExport: () => Promise<void>;
   onReset: () => void;
 }
@@ -12,6 +13,7 @@ type ExportStep = 'license' | 'ready' | 'saving' | 'done' | 'error';
 export function ExportPanel({
   licenseValid,
   onCheckLicense,
+  onChangeLicense,
   onExport,
   onReset,
 }: Props) {
@@ -21,6 +23,17 @@ export function ExportPanel({
     licenseValid ? 'ready' : 'license',
   );
   const [error, setError] = useState<string | null>(null);
+  const wasLicenseValidRef = useRef(licenseValid);
+
+  useEffect(() => {
+    const wasLicenseValid = wasLicenseValidRef.current;
+    wasLicenseValidRef.current = licenseValid;
+
+    if (!wasLicenseValid && licenseValid) {
+      setExportStep('ready');
+      setError(null);
+    }
+  }, [licenseValid]);
 
   const handleCheckLicense = async () => {
     if (!key.trim()) return;
@@ -59,6 +72,13 @@ export function ExportPanel({
       );
       setExportStep('ready');
     }
+  };
+
+  const handleChangeLicense = async () => {
+    setKey('');
+    setError(null);
+    setExportStep('license');
+    await onChangeLicense();
   };
 
   if (exportStep === 'done') {
@@ -201,6 +221,14 @@ export function ExportPanel({
         <p className="text-xs text-neutral-400 text-center">
           Save to any folder - keeps original untouched
         </p>
+
+        <button
+          type="button"
+          onClick={handleChangeLicense}
+          className="block mx-auto mt-3 text-xs text-neutral-400 underline underline-offset-2 hover:text-neutral-600 transition-colors"
+        >
+          Change license key
+        </button>
       </div>
     );
   }

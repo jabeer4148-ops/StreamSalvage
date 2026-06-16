@@ -16,6 +16,7 @@ export default function App() {
     undoSkipReference,
     startRepair,
     checkLicense,
+    changeLicense,
     exportFile,
     previewFile,
     showExport,
@@ -145,6 +146,7 @@ export default function App() {
         <ExportPanel
           licenseValid={state.licenseValid}
           onCheckLicense={checkLicense}
+          onChangeLicense={changeLicense}
           onExport={exportFile}
           onReset={reset}
         />

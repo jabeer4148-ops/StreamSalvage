@@ -9,6 +9,9 @@ import {
   repairNoReference,
   repairWithReference,
   validateLicense,
+  getStoredLicense,
+  saveStoredLicense,
+  clearStoredLicense,
   openFileInPlayer,
   saveRepairedFile,
   pickBrokenFile,
@@ -112,6 +115,39 @@ describe('tauriCommands', () => {
   });
 
   // ── openFileInPlayer ──────────────────────────────────────────────────
+
+  test('getStoredLicense returns saved key from invoke', async () => {
+    mockInvoke.mockResolvedValue('TEST-1234');
+
+    const result = await getStoredLicense();
+
+    expect(mockInvoke).toHaveBeenCalledWith('get_stored_license');
+    expect(result).toBe('TEST-1234');
+  });
+
+  test('getStoredLicense returns null on invoke failure', async () => {
+    mockInvoke.mockRejectedValue(new Error('No store'));
+
+    const result = await getStoredLicense();
+
+    expect(result).toBeNull();
+  });
+
+  test('saveStoredLicense writes key through invoke', async () => {
+    mockInvoke.mockResolvedValue(undefined);
+
+    await saveStoredLicense('TEST-1234');
+
+    expect(mockInvoke).toHaveBeenCalledWith('save_stored_license', { licenseKey: 'TEST-1234' });
+  });
+
+  test('clearStoredLicense clears through invoke', async () => {
+    mockInvoke.mockResolvedValue(undefined);
+
+    await clearStoredLicense();
+
+    expect(mockInvoke).toHaveBeenCalledWith('clear_stored_license');
+  });
 
   test('openFileInPlayer calls correct command with path', async () => {
     mockInvoke.mockResolvedValue(undefined);

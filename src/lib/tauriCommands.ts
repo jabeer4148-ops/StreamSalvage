@@ -84,6 +84,31 @@ export async function validateLicense(licenseKey: string): Promise<boolean> {
   }
 }
 
+export async function getStoredLicense(): Promise<string | null> {
+  try {
+    return await invoke<string | null>('get_stored_license');
+  } catch (err) {
+    console.error('get_stored_license failed:', err);
+    return null;
+  }
+}
+
+export async function saveStoredLicense(licenseKey: string): Promise<void> {
+  try {
+    await invoke('save_stored_license', { licenseKey });
+  } catch (err) {
+    console.error('save_stored_license failed:', err);
+  }
+}
+
+export async function clearStoredLicense(): Promise<void> {
+  try {
+    await invoke('clear_stored_license');
+  } catch (err) {
+    console.error('clear_stored_license failed:', err);
+  }
+}
+
 export async function openFileInPlayer(path: string): Promise<void> {
   try {
     await invoke('open_file_in_player', { path });

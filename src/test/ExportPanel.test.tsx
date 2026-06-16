@@ -6,6 +6,7 @@ import { ExportPanel } from '../components/ExportPanel';
 const makeMockProps = () => ({
   licenseValid: false,
   onCheckLicense: vi.fn(),
+  onChangeLicense: vi.fn(),
   onExport: vi.fn(),
   onReset: vi.fn(),
 });
@@ -147,6 +148,29 @@ describe('ExportPanel', () => {
       screen.getByRole('button', { name: /Save repaired video to disk/i }),
     ).toBeInTheDocument();
     expect(screen.queryByLabelText(/License key/i)).not.toBeInTheDocument();
+  });
+
+  test('moves to ready state when licenseValid becomes true after mount', async () => {
+    const { rerender } = render(<ExportPanel {...mockProps} />);
+    expect(screen.getByLabelText(/License key/i)).toBeInTheDocument();
+
+    rerender(<ExportPanel {...mockProps} licenseValid={true} />);
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /Save repaired video to disk/i })).toBeInTheDocument(),
+    );
+    expect(screen.queryByLabelText(/License key/i)).not.toBeInTheDocument();
+  });
+
+  test('shows change license key link and returns to license entry', async () => {
+    const user = userEvent.setup();
+    mockProps.onChangeLicense.mockResolvedValue(undefined);
+    render(<ExportPanel {...mockProps} licenseValid={true} />);
+
+    await user.click(screen.getByRole('button', { name: /Change license key/i }));
+
+    expect(mockProps.onChangeLicense).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText(/License key/i)).toBeInTheDocument();
   });
 
   test('calls onExport when save button is clicked', async () => {
