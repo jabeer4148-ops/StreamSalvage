@@ -6,24 +6,24 @@
 
   <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
 
-  <title>A Simple untrunc Alternative for Repairing MP4 Files</title>
-  <meta name="description" content="untrunc repairs broken MP4 files from the command line. Here's how it works, and a drag-and-drop alternative that does the same reference-based repair." />
+  <title>untrunc: Repair Broken MP4 Files Without the Command Line</title>
+  <meta name="description" content="What is untrunc and how do you use it? How the free MP4 repair tool works, how to run it, and a drag-and-drop alternative with a free preview." />
   <link rel="canonical" href="https://www.streamsalvage.com/guides/untrunc-alternative" />
 
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://www.streamsalvage.com/guides/untrunc-alternative" />
-  <meta property="og:title" content="A Simple untrunc Alternative for Repairing MP4 Files" />
+  <meta property="og:title" content="untrunc: Repair Broken MP4 Files Without the Command Line" />
   <meta property="og:description" content="How untrunc repairs corrupted MP4 files, and a drag-and-drop alternative that does the same reference-based repair without the command line." />
   <meta property="og:site_name" content="StreamSalvage" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="A Simple untrunc Alternative for Repairing MP4 Files" />
+  <meta name="twitter:title" content="untrunc: Repair Broken MP4 Files Without the Command Line" />
   <meta name="twitter:description" content="The same reference-based MP4 repair as untrunc, without the command line." />
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "A Simple untrunc Alternative for Repairing MP4 Files",
+    "headline": "untrunc: Repair Broken MP4 Files Without the Command Line",
     "description": "How untrunc repairs corrupted MP4 files, and a drag-and-drop alternative that does the same reference-based repair without the command line.",
     "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
     "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
@@ -52,6 +52,11 @@
         "@type": "Question",
         "name": "What does untrunc do?",
         "acceptedAnswer": { "@type": "Answer", "text": "untrunc is a free, open-source tool that repairs truncated or unfinalized MP4 and MOV files. It uses a healthy reference video recorded with the same settings to rebuild the missing moov atom in a broken file, making it playable again." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I use untrunc?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Install or compile untrunc, then run it from the command line with a healthy reference file and the broken file: 'untrunc good.mp4 broken.mp4'. It writes a repaired copy next to the original. There is no preview, so you confirm success by opening the output." }
       },
       {
         "@type": "Question",
@@ -146,8 +151,8 @@
         <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>untrunc alternative</span>
       </nav>
 
-      <p class="eyebrow">Tool comparison</p>
-      <h1>A simpler untrunc alternative for repairing broken MP4 files</h1>
+      <p class="eyebrow">untrunc guide</p>
+      <h1>untrunc: what it is and how to repair an MP4 without the command line</h1>
       <p class="meta">Last updated June 13, 2026 · ~5 min read</p>
 
       <p class="lead">If you've searched for how to fix a truncated or unfinalized MP4, you've probably run into <code>untrunc</code>. It genuinely works — but it's a command-line tool you have to compile yourself, and that stops a lot of people in their tracks. This guide explains what untrunc does, when it's the right choice, and a drag-and-drop alternative that uses the same repair method.</p>
@@ -158,6 +163,16 @@
       <div class="callout">
         <p>If you want the full explanation of why recordings corrupt this way, see our guide on <a href="/guides/fix-corrupted-obs-recording">fixing a corrupted OBS recording</a>.</p>
       </div>
+
+      <h2>How to use untrunc, step by step</h2>
+      <p>If you want to run untrunc yourself, the process looks like this:</p>
+      <ol>
+        <li><strong>Get untrunc.</strong> On Linux/macOS you compile it from source (the <code>anthwlock/untrunc</code> fork is the most current); on Windows most people use an unofficial pre-built binary or run it under WSL.</li>
+        <li><strong>Find a reference file.</strong> You need a healthy video recorded by the same device/app at the same settings as the broken one — it supplies the working <code>moov atom</code>.</li>
+        <li><strong>Run the command.</strong> Point untrunc at the reference and the broken file: <code>untrunc good.mp4 broken.mp4</code>. It writes a new <code>broken_fixed.mp4</code> next to the original.</li>
+        <li><strong>Check the result.</strong> Open the output and confirm video and audio play in sync — there's no preview, so this is trial and error.</li>
+      </ol>
+      <p>That's the whole tool. When it works, it works well — but every step above is a place non-technical users get stuck, which is the gap the rest of this guide covers.</p>
 
       <h2>Where untrunc gets hard</h2>
       <p>The repair logic is solid; the friction is everything around it:</p>
@@ -199,6 +214,10 @@
           <p>untrunc is a free, open-source tool that repairs truncated or unfinalized MP4 and MOV files. It uses a healthy reference video recorded with the same settings to rebuild the missing moov atom in a broken file, making it playable again.</p>
         </details>
         <details>
+          <summary>How do I use untrunc?</summary>
+          <p>Install or compile untrunc, then run it from the command line with a healthy reference file and the broken file: <code>untrunc good.mp4 broken.mp4</code>. It writes a repaired copy next to the original. There is no preview, so you confirm success by opening the output.</p>
+        </details>
+        <details>
           <summary>Is there a GUI version of untrunc?</summary>
           <p>There is a community untrunc-gui project, but it can be hard to build and is no longer actively maintained for newer systems. If you want a maintained drag-and-drop experience, StreamSalvage performs the same reference-based repair with a graphical interface and a free preview.</p>
         </details>
@@ -214,8 +233,9 @@
 
       <div class="related">
         <h3>Related guides</h3>
+        <a href="/guides/repair-corrupted-mp4">How to repair a corrupted MP4 file →</a>
+        <a href="/guides/moov-atom-not-found">"Moov atom not found": what it means and how to fix it →</a>
         <a href="/guides/fix-corrupted-obs-recording">How to fix a corrupted OBS recording →</a>
-        <a href="/guides/repair-mp4-without-uploading">How to repair an MP4 without uploading it anywhere →</a>
       </div>
     </div>
   </main>

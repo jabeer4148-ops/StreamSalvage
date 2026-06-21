@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>How to Repair a Corrupted MP4 File (Free Preview, No Upload)</title>
+  <meta name="description" content="Repair a corrupted or unplayable MP4 on your own PC — no upload, no subscription. See what's recoverable free, then fix it for a $29 one-time fee." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/repair-corrupted-mp4" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/repair-corrupted-mp4" />
+  <meta property="og:title" content="How to Repair a Corrupted MP4 File (Free Preview, No Upload)" />
+  <meta property="og:description" content="Repair a corrupted or unplayable MP4 locally — no upload, no subscription. Free preview, $29 one-time." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="How to Repair a Corrupted MP4 File (Free Preview, No Upload)" />
+  <meta name="twitter:description" content="Repair a corrupted MP4 locally — no upload, no subscription, free preview." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "How to Repair a Corrupted MP4 File (Without Uploading It)",
+    "description": "How to repair a corrupted or unplayable MP4 file on your own PC, with a free preview and no upload.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-06-15",
+    "dateModified": "2026-06-15",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/repair-corrupted-mp4"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Repair a corrupted MP4", "item": "https://www.streamsalvage.com/guides/repair-corrupted-mp4" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I fix a corrupted MP4 file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "First try a plain FFmpeg stream copy, which re-wraps readable data into a fresh container. If that fails, the file usually needs its missing index (the moov atom) rebuilt using a healthy reference clip recorded with the same settings. StreamSalvage does this locally and previews the result before you pay." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can a corrupted MP4 be recovered?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Usually yes if the file was interrupted rather than physically damaged. The video frames are typically still present; only the index that lets a player read them is missing, and that can be rebuilt." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I repair an MP4 without uploading it to a website?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Desktop tools process the file on your own computer, so the video never leaves your machine. StreamSalvage runs 100% locally and has no upload step, which also means no file-size limits and no slow transfer for large recordings." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why won't VLC fix my corrupted MP4?",
+        "acceptedAnswer": { "@type": "Answer", "text": "VLC can play through minor glitches but cannot rebuild a missing moov atom. When the index a player needs is gone entirely, VLC has nothing to play from, so the file needs a proper repair." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Repair a corrupted MP4</span>
+      </nav>
+
+      <p class="eyebrow">MP4 repair</p>
+      <h1>How to repair a corrupted MP4 file — locally, without uploading it</h1>
+      <p class="meta">Last updated June 15, 2026 · ~6 min read</p>
+
+      <p class="lead">A corrupted MP4 that won't play is usually more fixable than it looks. Most "broken" files were simply interrupted before they finished writing — the footage is still there, just unreadable. This guide walks through how to repair a corrupted MP4 file on your own computer, what to try free first, and how to do it without uploading private video to a stranger's server.</p>
+
+      <h2>Why MP4 files get corrupted</h2>
+      <p>An MP4 only becomes playable once it's finalized and its index — the <strong>moov atom</strong> — is written at the end. Anything that interrupts that final step leaves a file that's mostly complete but won't open:</p>
+      <ul>
+        <li>A recorder or editor <strong>crashed</strong> before saving.</li>
+        <li><strong>Power loss</strong> or a forced shutdown mid-write.</li>
+        <li>The <strong>disk filled up</strong> during recording.</li>
+        <li>An <strong>interrupted copy, download, or transfer</strong>.</li>
+      </ul>
+      <p>If you're seeing a <a href="/guides/moov-atom-not-found">"moov atom not found"</a> error, that's exactly this: the index is missing, not the footage.</p>
+
+      <h2>Step 1: Work on a copy and try the free fix</h2>
+      <p>Always duplicate the broken file and repair the copy. Then try a plain FFmpeg stream copy, which re-wraps whatever readable data exists into a fresh container:</p>
+      <p><code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code></p>
+      <p>This works maybe 40% of the time — usually when only the tail of the file was lost. It's fast and free, so it's always worth a first attempt.</p>
+
+      <h2>Step 2: Rebuild the index with a reference file</h2>
+      <p>When a stream copy fails, the file needs its missing moov atom rebuilt. The reliable way is a <strong>reference file</strong>: a short, healthy clip from the same device or app at the same settings. Its correct index becomes the template used to reconstruct your broken file's. This is the technique that takes success rates to around <strong>85%</strong>, and it's what tools like <a href="/guides/untrunc-alternative">untrunc</a> do — StreamSalvage does the same thing with a guided workflow and a free preview, no command line.</p>
+      <div class="callout warn">
+        <p><strong>Don't keep re-saving the original.</strong> Each failed attempt on your only copy risks making things worse. Repair a duplicate every time.</p>
+      </div>
+
+      <h2>Repair without uploading your video</h2>
+      <p>Most "free online MP4 repair" sites require you to upload the file first. For anything private — client work, gameplay, unreleased footage — that means handing your only copy to a third-party server, and large files can take hours to upload. A desktop tool avoids all of that by repairing the file in place on your machine.</p>
+      <table aria-label="Online repair compared with local repair">
+        <thead><tr><th scope="col">Online repair sites</th><th scope="col">Local repair (StreamSalvage)</th></tr></thead>
+        <tbody>
+          <tr><td>Upload required</td><td>Nothing leaves your PC</td></tr>
+          <tr><td>File-size caps common</td><td>Handles 100GB+ files</td></tr>
+          <tr><td>Footage on their servers</td><td>100% private</td></tr>
+          <tr><td>Often subscription</td><td>$29 one-time</td></tr>
+          <tr><td>Repair you can't preview</td><td>Free preview before you pay</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cta-box">
+        <h3>Repair your corrupted MP4 — free preview, no upload</h3>
+        <p>Drop the broken file into StreamSalvage, see what's recoverable for free, and pay $29 only if the repaired file plays. Everything runs locally on your PC.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>When a file genuinely can't be saved</h2>
+      <p>Repair works when a file was <em>interrupted</em>. If the underlying bytes are physically damaged — bad disk sectors, a failing drive, or a partial file with missing frame data — results vary and some footage may be unrecoverable. A free preview tells you what's salvageable before you spend anything.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>How do I fix a corrupted MP4 file?</summary>
+          <p>First try a plain FFmpeg stream copy, which re-wraps readable data into a fresh container. If that fails, the file usually needs its missing index (the moov atom) rebuilt using a healthy reference clip recorded with the same settings. StreamSalvage does this locally and previews the result before you pay.</p>
+        </details>
+        <details>
+          <summary>Can a corrupted MP4 be recovered?</summary>
+          <p>Usually yes if the file was interrupted rather than physically damaged. The video frames are typically still present; only the index that lets a player read them is missing, and that can be rebuilt.</p>
+        </details>
+        <details>
+          <summary>Can I repair an MP4 without uploading it to a website?</summary>
+          <p>Yes. Desktop tools process the file on your own computer, so the video never leaves your machine. StreamSalvage runs 100% locally and has no upload step, which also means no file-size limits and no slow transfer for large recordings.</p>
+        </details>
+        <details>
+          <summary>Why won't VLC fix my corrupted MP4?</summary>
+          <p>VLC can play through minor glitches but cannot rebuild a missing moov atom. When the index a player needs is gone entirely, VLC has nothing to play from, so the file needs a proper repair.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/moov-atom-not-found">"Moov atom not found": what it means and how to fix it →</a>
+        <a href="/guides/untrunc-alternative">untrunc: repair an MP4 without the command line →</a>
+        <a href="/guides/repair-mp4-without-uploading">Repair an MP4 without uploading it anywhere →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>
