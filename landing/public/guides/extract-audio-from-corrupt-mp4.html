@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>Extract Audio From a Corrupt MP4 (Podcast &amp; Voice Recovery)</title>
+  <meta name="description" content="Recording crashed and you only need the audio? How to pull the voice track out of a corrupt MP4 — repair the container first, then extract the audio losslessly." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/extract-audio-from-corrupt-mp4" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/extract-audio-from-corrupt-mp4" />
+  <meta property="og:title" content="Extract Audio From a Corrupt MP4 (Podcast &amp; Voice Recovery)" />
+  <meta property="og:description" content="Repair the container first, then extract the voice track losslessly." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Extract Audio From a Corrupt MP4 (Podcast &amp; Voice Recovery)" />
+  <meta name="twitter:description" content="Repair the container first, then extract the voice track losslessly." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Extract Audio From a Corrupt MP4 (Podcast & Voice Recovery)",
+    "description": "How to recover just the audio track from a corrupted MP4 recording: repair the container, then extract the audio losslessly with FFmpeg.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/extract-audio-from-corrupt-mp4"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Extract audio from corrupt MP4", "item": "https://www.streamsalvage.com/guides/extract-audio-from-corrupt-mp4" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can I get just the audio out of a corrupted MP4?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — but not directly. A corrupt MP4's audio track is trapped behind the same missing index as the video. Repair the container first (reference-file method), then extract the audio losslessly. The audio track usually survives corruption at least as well as the video." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I extract the audio once the MP4 is repaired?",
+        "acceptedAnswer": { "@type": "Answer", "text": "One FFmpeg command, no quality loss: ffmpeg -i repaired.mp4 -vn -acodec copy audio.m4a. The -acodec copy flag copies the AAC track bit-for-bit instead of re-encoding it — your podcast audio stays exactly as recorded." }
+      },
+      {
+        "@type": "Question",
+        "name": "My repair tool recovered video but the audio is glitched — is the voice gone?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Not necessarily. Some tools rebuild the video sample table but mis-time the audio. A reference-file repair with a clip from the same recorder rebuilds both tracks' timing from the template, which often fixes audio that another tool garbled." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to upload my podcast recording to recover the audio?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. The whole chain — container repair and audio extraction — runs locally. StreamSalvage repairs the file on your PC with a free preview, and the FFmpeg extraction step is a single offline command." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Extract audio from corrupt MP4</span>
+      </nav>
+
+      <p class="eyebrow">Method explained</p>
+      <h1>Extract audio from a corrupt MP4 (podcast &amp; voice recovery)</h1>
+      <p class="meta">Last updated July 8, 2026 · ~4 min read</p>
+
+      <p class="lead">Your PC crashed mid-podcast, the MP4 is corrupt — and honestly, you don't care about the video. You need the <em>conversation</em>. Good news: the audio track survives corruption just as well as the video does, and recovering only-the-audio is a two-step job.</p>
+
+      <div class="callout">
+        <p><strong>Quick answer:</strong> you can't pull audio out of a container no tool can read — so repair the container first (reference-file method), then extract the track losslessly with <code>ffmpeg -i repaired.mp4 -vn -acodec copy audio.m4a</code>.</p>
+      </div>
+
+      <h2>Why you can't extract from the broken file directly</h2>
+      <p>The audio isn't a separate file inside the MP4 — it's interleaved with video in chunks, and the missing <a href="/guides/moov-atom-not-found">index</a> is the only map of which chunks are which. Audio-extractor apps fail on a corrupt MP4 for the same reason players do: nothing can locate the audio samples without the index. Rebuild the index once, and both tracks come back together.</p>
+
+      <h2>Step 1: repair the container</h2>
+      <ol>
+        <li>Work on a copy of the broken file.</li>
+        <li>Try <code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code> — occasionally enough.</li>
+        <li>Otherwise use the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a>: record ~10 seconds with the same app and settings (easy for podcast/screen setups — you control the recorder) and rebuild the broken file from it.</li>
+      </ol>
+      <p>Tip for the mixed-result case: if another tool already gave you playable video with broken audio, rerun the repair from the original broken file with a proper reference clip — rebuilt timing from a template usually fixes what one-click restores (Bandicam's included) garble.</p>
+
+      <h2>Step 2: extract the audio losslessly</h2>
+      <p>Once the repaired file plays:</p>
+      <p><code>ffmpeg -i repaired.mp4 -vn -acodec copy audio.m4a</code></p>
+      <ul>
+        <li><code>-vn</code> drops the video; <code>-acodec copy</code> copies the AAC track bit-for-bit — no re-encode, no quality loss.</li>
+        <li>Need WAV for editing? <code>ffmpeg -i repaired.mp4 -vn audio.wav</code> (decodes to PCM).</li>
+        <li>Multiple mics recorded as separate tracks? List them with <code>ffprobe repaired.mp4</code> and pick with <code>-map 0:a:1</code> etc.</li>
+      </ul>
+
+      <div class="cta-box">
+        <h3>Get the conversation back</h3>
+        <p>StreamSalvage repairs the crashed recording locally — free preview so you can hear that the audio survived before paying $29. Then one FFmpeg command gives you the clean track.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Can I get just the audio out of a corrupted MP4?</summary>
+          <p>Yes — but not directly. A corrupt MP4's audio track is trapped behind the same missing index as the video. Repair the container first (reference-file method), then extract the audio losslessly. The audio track usually survives corruption at least as well as the video.</p>
+        </details>
+        <details>
+          <summary>How do I extract the audio once the MP4 is repaired?</summary>
+          <p>One FFmpeg command, no quality loss: <code>ffmpeg -i repaired.mp4 -vn -acodec copy audio.m4a</code>. The <code>-acodec copy</code> flag copies the AAC track bit-for-bit instead of re-encoding it — your podcast audio stays exactly as recorded.</p>
+        </details>
+        <details>
+          <summary>My repair tool recovered video but the audio is glitched — is the voice gone?</summary>
+          <p>Not necessarily. Some tools rebuild the video sample table but mis-time the audio. A reference-file repair with a clip from the same recorder rebuilds both tracks' timing from the template, which often fixes audio that another tool garbled.</p>
+        </details>
+        <details>
+          <summary>Do I need to upload my podcast recording to recover the audio?</summary>
+          <p>No. The whole chain — container repair and audio extraction — runs locally. StreamSalvage repairs the file on your PC with a free preview, and the FFmpeg extraction step is a single offline command.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+        <a href="/guides/screen-recording-corrupted">Screen recording corrupted? →</a>
+        <a href="/guides/repair-mp4-after-pc-crash">Repair an MP4 after a PC crash →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

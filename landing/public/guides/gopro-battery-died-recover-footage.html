@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>GoPro Battery Died While Recording? How to Recover the Footage</title>
+  <meta name="description" content="Your GoPro's battery died mid-recording and the footage looks deleted or won't play. It's usually still on the card. Recovery steps for every Hero generation." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/gopro-battery-died-recover-footage" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/gopro-battery-died-recover-footage" />
+  <meta property="og:title" content="GoPro Battery Died While Recording? How to Recover the Footage" />
+  <meta property="og:description" content="The footage is usually still on the card. Recovery steps for every Hero generation." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="GoPro Battery Died While Recording? How to Recover the Footage" />
+  <meta name="twitter:description" content="The footage is usually still on the card. Recovery steps for every Hero." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "GoPro Battery Died While Recording? How to Recover the Footage",
+    "description": "Why a dead GoPro battery leaves unplayable or seemingly deleted footage, and the recovery sequence that gets it back.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/gopro-battery-died-recover-footage"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "GoPro battery died — recover footage", "item": "https://www.streamsalvage.com/guides/gopro-battery-died-recover-footage" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Does a GoPro delete footage when the battery dies?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No — it just fails to finish saving it. The recording up to the moment of power loss is written to the SD card as an unfinalized file. It may not appear in the GoPro app or may refuse to play, but the data is on the card and is usually recoverable." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I recover GoPro footage after the battery died mid-recording?",
+        "acceptedAnswer": { "@type": "Answer", "text": "First: charge or swap the battery, reinsert the SD card, and power the camera on — the SOS repair icon appears if the GoPro detects an unfinalized file, and pressing any button repairs it. If that fails, copy the file to a PC and rebuild it with a reference clip from the same camera and settings." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does GoPro's own repair cut off the last seconds?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The last few seconds were in the camera's memory buffer and never reached the card before power was lost. No repair tool can recover frames that were never written. Everything that made it to the card is what's recoverable — typically all but the final 1-10 seconds." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why does my GoPro keep dying mid-recording with a charged battery?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Aging batteries lose voltage under load — a battery can read full but sag below the camera's cutoff during a 5K recording. Cold weather makes it worse. Use newer official batteries, keep spares warm, and for static shots run USB power." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>GoPro battery died — recover footage</span>
+      </nav>
+
+      <p class="eyebrow">Device guide</p>
+      <h1>GoPro battery died while recording? How to recover the footage</h1>
+      <p class="meta">Last updated July 8, 2026 · ~6 min read</p>
+
+      <p class="lead">Hours of riding, a whole festival set, a once-only run — the LED was blinking the entire time, then the battery died, and now the footage either won't play or seems to have vanished. This is the single most common GoPro complaint there is, across every Hero generation. The good news: the footage is almost always still on the card.</p>
+
+      <div class="callout">
+        <p><strong>Quick answer:</strong> a dead battery doesn't delete footage — it prevents the file from being <em>finalized</em>. Power the GoPro back up with the card in to trigger its SOS repair; if that fails or clips are missing, recover the file from the card on a PC and rebuild it with a reference clip from the same camera.</p>
+      </div>
+
+      <h2>Why the footage "disappears"</h2>
+      <p>A GoPro writes video to the SD card continuously but writes the file's index — the part that makes it playable and visible to apps — when recording stops normally. Battery death mid-write means: an unfinalized file (plays nowhere), a file that doesn't show in the GoPro app or on your phone (the app skips unreadable files), or in chaptered recordings, only the completed chapters visible.</p>
+
+      <h2>Recovery, in order</h2>
+      <ol>
+        <li><strong>Don't format, don't keep recording.</strong> Every new recording risks overwriting the unfinalized data.</li>
+        <li><strong>Trigger SOS repair.</strong> Fresh battery in, card in, power on. If the camera finds an unfinalized file it shows the repair icon — press any button. This fixes the majority of battery-death files. (Camera repairing endlessly? Plug into USB power and let it finish.)</li>
+        <li><strong>Check the card in a card reader, not the app.</strong> Files invisible to the GoPro app are often right there in <code>DCIM</code> when the card is mounted on a PC. Copy everything off before further attempts.</li>
+        <li><strong>File present but unplayable →</strong> rebuild it with the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a>. Any healthy clip from the same camera at the same resolution/frame rate works — the run before this one is perfect.</li>
+        <li><strong>Files genuinely missing from the card →</strong> that's card-level recovery (the file table was never updated). Use SD-recovery software before writing anything to the card, then repair whatever it carves out.</li>
+      </ol>
+
+      <div class="cta-box">
+        <h3>When SOS repair isn't enough</h3>
+        <p>StreamSalvage rebuilds the unfinalized file on your PC from a healthy reference clip — 5K files included, no upload, free preview, $29 only if your footage comes back.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Expect to lose the last few seconds</h2>
+      <p>Frames still in the camera's buffer at the moment of power loss never reached the card. Even GoPro's own recovery typically ends ~10 seconds before the cutoff. That's not the repair tool failing — those frames don't exist anywhere.</p>
+
+      <h2>Stop it happening again</h2>
+      <ul>
+        <li><strong>Old batteries lie.</strong> A worn battery reads 100% but sags under 5K/60 load and hard cuts the camera. Users report this on month-old cameras with third-party or aged packs — replace suspect batteries first.</li>
+        <li><strong>Cold kills voltage.</strong> Keep spares in an inside pocket on winter shoots.</li>
+        <li><strong>USB power for static shots</strong> — but note some models can still die while plugged in if the source can't sustain output; use a 5V/2A+ supply.</li>
+        <li><strong>Genuine, fast SD cards.</strong> A slow or fake card causes its own corrupt-file problems — see the <a href="/guides/repair-corrupted-gopro-video">full GoPro repair guide</a>.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Does a GoPro delete footage when the battery dies?</summary>
+          <p>No — it just fails to finish saving it. The recording up to the moment of power loss is written to the SD card as an unfinalized file. It may not appear in the GoPro app or may refuse to play, but the data is on the card and is usually recoverable.</p>
+        </details>
+        <details>
+          <summary>How do I recover GoPro footage after the battery died mid-recording?</summary>
+          <p>First: charge or swap the battery, reinsert the SD card, and power the camera on — the SOS repair icon appears if the GoPro detects an unfinalized file, and pressing any button repairs it. If that fails, copy the file to a PC and rebuild it with a reference clip from the same camera and settings.</p>
+        </details>
+        <details>
+          <summary>Why does GoPro's own repair cut off the last seconds?</summary>
+          <p>The last few seconds were in the camera's memory buffer and never reached the card before power was lost. No repair tool can recover frames that were never written. Everything that made it to the card is what's recoverable — typically all but the final 1–10 seconds.</p>
+        </details>
+        <details>
+          <summary>Why does my GoPro keep dying mid-recording with a charged battery?</summary>
+          <p>Aging batteries lose voltage under load — a battery can read full but sag below the camera's cutoff during a 5K recording. Cold weather makes it worse. Use newer official batteries, keep spares warm, and for static shots run USB power.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-corrupted-gopro-video">GoPro video corrupted? Full repair guide →</a>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+        <a href="/guides/camera-died-while-recording">Camera died while recording (Sony, Canon, Panasonic) →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>Error 0xc00d36e5 "Item Is Unplayable": Causes and Fixes</title>
+  <meta name="description" content="Error 0xc00d36e5 'item is unplayable, please reacquire the content' usually means the file was truncated during a transfer. How to check, and how to repair it." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/error-0xc00d36e5" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/error-0xc00d36e5" />
+  <meta property="og:title" content="Error 0xc00d36e5 &quot;Item Is Unplayable&quot;: Causes and Fixes" />
+  <meta property="og:description" content="Usually a truncated transfer. How to check the original — and repair the copy locally." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Error 0xc00d36e5 &quot;Item Is Unplayable&quot;: Causes and Fixes" />
+  <meta name="twitter:description" content="Usually a truncated transfer. How to check — and repair locally." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Error 0xc00d36e5 \"Item Is Unplayable\": Causes and Fixes",
+    "description": "What Windows error 0xc00d36e5 means, why interrupted phone-to-PC transfers cause it, and how to repair the truncated file locally.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/error-0xc00d36e5"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Error 0xc00d36e5", "item": "https://www.streamsalvage.com/guides/error-0xc00d36e5" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does error 0xc00d36e5 'item is unplayable' mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Windows opened the file but found its contents unreadable — most often because the file was cut short during a copy or transfer. The size can even look right while the crucial index data at the end is missing or garbled." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why did my video break when I copied it from my phone?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Phone-to-USB and phone-to-PC transfers over MTP are fragile: unplugging early, a flaky cable, or a drive ejected before the write-cache flushed all truncate the file. The copy triggers 0xc00d36e5 even though the recording was fine on the phone." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the original video still on my phone?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Check before anything else — if the original plays on the phone, just re-transfer it with a cable and don't disconnect mid-copy. If the original was deleted after the transfer, the corrupted copy is all you have, and it needs structural repair." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can a file with error 0xc00d36e5 be repaired?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Often, yes. If most of the stream data survived the truncation, a reference-file repair can rebuild the missing index — using a short healthy clip from the same phone or camera as a template. StreamSalvage does this locally with a free preview." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Error 0xc00d36e5</span>
+      </nav>
+
+      <p class="eyebrow">Error explained</p>
+      <h1>Error 0xc00d36e5 "item is unplayable": causes and fixes</h1>
+      <p class="meta">Last updated July 8, 2026 · ~4 min read</p>
+
+      <p class="lead">"Item is unplayable, please reacquire the content. 0xc00d36e5." The message sounds like a DRM problem, but on your own recordings it almost always means one thing: the file was <strong>cut short during a transfer</strong>. The classic case — recorded on a phone, tested fine, copied via USB stick to a PC, now dead.</p>
+
+      <div class="callout">
+        <p><strong>Quick answer:</strong> check the original on the source device first — if it still plays, re-transfer with a cable and you're done. If the original is gone, the truncated copy can usually be repaired locally by rebuilding its index from a short healthy clip recorded on the same device.</p>
+      </div>
+
+      <h2>What actually happened</h2>
+      <p>MTP transfers (phone → PC), USB sticks, and SD readers all buffer writes. Disconnect early — or hit a flaky cable or a failing stick — and the tail of the file never lands. Since an MP4 stores its index at the end, a truncated copy can show the <em>right file size</em> in Explorer and still be missing the structure players need. Windows reports it as "unplayable."</p>
+
+      <h2>Fix it, in order</h2>
+      <ol>
+        <li><strong>Check the source device.</strong> If the video still plays on the phone/camera, delete the bad copy, re-transfer with a cable, and safely eject before unplugging. Done — no repair needed.</li>
+        <li><strong>Re-copy from the USB stick.</strong> Sometimes the stick's copy is fine and it's the second hop that broke. Compare file sizes byte-for-byte, not just "56 MB".</li>
+        <li><strong>Original gone? Repair the copy.</strong> Work on a duplicate, try <code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code>, and when that fails use the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a>: record a 10-second clip on the same phone at the same settings and rebuild the index from it.</li>
+      </ol>
+      <div class="callout warn">
+        <p><strong>Skip the converters.</strong> VLC's convert tool on a truncated MP4 produces a near-empty file — it can't read what it's converting. That 1 KB output doesn't mean your footage is gone; it means you need index reconstruction, not conversion.</p>
+      </div>
+
+      <div class="cta-box">
+        <h3>Repair the truncated copy — locally</h3>
+        <p>StreamSalvage rebuilds the missing index on your own PC from a short reference clip. Free preview of the repaired video, $29 one-time only if it works, nothing uploaded.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Related Windows playback errors</h2>
+      <p>Same family, different codes: <a href="/guides/error-0xc00d36c4">0xc00d36c4</a> (format not supported), <a href="/guides/error-0xc00d5212">0xc00d5212</a> (missing codec), <a href="/guides/error-0xc10100be">0xc10100be</a> (file isn't playable). The diagnosis pattern — test in VLC, check the source, then repair — is the same for all.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What does error 0xc00d36e5 "item is unplayable" mean?</summary>
+          <p>Windows opened the file but found its contents unreadable — most often because the file was cut short during a copy or transfer. The size can even look right while the crucial index data at the end is missing or garbled.</p>
+        </details>
+        <details>
+          <summary>Why did my video break when I copied it from my phone?</summary>
+          <p>Phone-to-USB and phone-to-PC transfers over MTP are fragile: unplugging early, a flaky cable, or a drive ejected before the write-cache flushed all truncate the file. The copy triggers 0xc00d36e5 even though the recording was fine on the phone.</p>
+        </details>
+        <details>
+          <summary>Is the original video still on my phone?</summary>
+          <p>Check before anything else — if the original plays on the phone, just re-transfer it with a cable and don't disconnect mid-copy. If the original was deleted after the transfer, the corrupted copy is all you have, and it needs structural repair.</p>
+        </details>
+        <details>
+          <summary>Can a file with error 0xc00d36e5 be repaired?</summary>
+          <p>Often, yes. If most of the stream data survived the truncation, a reference-file repair can rebuild the missing index — using a short healthy clip from the same phone or camera as a template. StreamSalvage does this locally with a free preview.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/fix-corrupted-phone-video">Phone died while recording? Fix the video →</a>
+        <a href="/guides/error-0xc00d36c4">Error 0xc00d36c4 explained →</a>
+        <a href="/guides/how-to-uncorrupt-a-mp4">How to uncorrupt an MP4 →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

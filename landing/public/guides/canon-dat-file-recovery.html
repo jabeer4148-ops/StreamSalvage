@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>Canon .DAT File Recovery: Get Your Video Back After a Crash</title>
+  <meta name="description" content="A Canon camera that crashes mid-recording can leave a .DAT file instead of a video. That file usually contains your footage — here's how to recover it." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/canon-dat-file-recovery" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/canon-dat-file-recovery" />
+  <meta property="og:title" content="Canon .DAT File Recovery: Get Your Video Back After a Crash" />
+  <meta property="og:description" content="The .DAT file usually contains your footage — here's how to recover it locally." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Canon .DAT File Recovery: Get Your Video Back After a Crash" />
+  <meta name="twitter:description" content="The .DAT file usually contains your footage. Recover it locally." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Canon .DAT File Recovery: Get Your Video Back After a Crash",
+    "description": "What the .DAT file left by a crashed Canon camera contains, and how to turn it back into a playable video with reference-file repair.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/canon-dat-file-recovery"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Canon .DAT file recovery", "item": "https://www.streamsalvage.com/guides/canon-dat-file-recovery" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the .DAT file my Canon camera left on the card?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It's the unfinalized remains of an interrupted recording. When a Canon body (R5 II, C70, and others) crashes or loses power mid-take, the encoded video data stays on the card without the container structure that would make it an MP4/MOV — surfaced as a .DAT file. Your footage is usually inside it." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can the Canon camera itself repair the .DAT file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Try it first: reinsert the card into the same body and power on. Canon bodies detect interrupted clips and may offer to recover them. If the camera repairs it, you get a normal playable file with no extra work." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I convert a Canon .DAT file back to video on a PC?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Copy it off the card, rename a copy to .mp4 (or .mov for C-series), and test it. If it won't play, use reference-file repair: a healthy clip from the same camera at the same settings provides the structural template to rebuild the container around the raw stream." }
+      },
+      {
+        "@type": "Question",
+        "name": "Will renaming the .DAT to .MP4 alone fix it?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Rarely — the extension change just lets players attempt to read it. Since the container was never finalized, most .DAT files still need their index rebuilt. Renaming is a free first test, not the fix." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Canon .DAT file recovery</span>
+      </nav>
+
+      <p class="eyebrow">Pro workflow</p>
+      <h1>Canon .DAT file recovery: get your video back after a crash</h1>
+      <p class="meta">Last updated July 8, 2026 · ~5 min read</p>
+
+      <p class="lead">Your Canon crashed mid-take — an R5 II lockup, a C70 fault, a power cut — and where the clip should be, the card shows a <code>.DAT</code> file. Don't delete it. That file is the encoded video your sensor captured, minus the container that makes it playable. It's Canon's version of Panasonic's <a href="/guides/mdt-file-recovery">.mdt leftover</a>, and the recovery path is the same.</p>
+
+      <div class="callout">
+        <p><strong>Quick answer:</strong> let the camera try first (card back in, power on — Canon bodies offer built-in recovery of interrupted clips). If that fails: copy the .DAT to your PC, rename a copy to .mp4/.mov as a free test, and when it still won't play, rebuild the container with a reference clip from the same camera and settings.</p>
+      </div>
+
+      <h2>Why Canon leaves a .DAT behind</h2>
+      <p>Canon bodies, like all cameras, write the finalizing structures — the index, the container closure — when you stop recording normally. A firmware crash, BSOD-adjacent lockup, thermal cutoff, or yanked power interrupts that step. The raw H.264/H.265 (or XF-AVC on Cinema bodies) stream is on the card; the wrapper isn't. The file system surfaces the orphaned data as <code>.DAT</code>.</p>
+
+      <h2>Recovery steps</h2>
+      <ol>
+        <li><strong>Protect the card.</strong> No formatting, no new recording. Copy the .DAT and at least one healthy clip from the same camera/settings to your computer.</li>
+        <li><strong>In-camera recovery.</strong> Card back into the <em>same body</em>, power on. If Canon's recovery prompt appears, run it — free and lossless when it works.</li>
+        <li><strong>The rename test.</strong> On a copy: <code>clip.DAT → clip.mp4</code> (C-series MXF/MOV workflows: try <code>.mov</code>). Test in VLC and probe with MediaInfo. Occasionally it just plays.</li>
+        <li><strong>Stream copy:</strong> <code>ffmpeg -i clip.mp4 -c copy fixed.mp4</code>. If FFmpeg says <a href="/guides/ffmpeg-invalid-data-found">invalid data found</a>, the index is missing — expected.</li>
+        <li><strong>Reference-file repair.</strong> The healthy same-settings clip becomes the template to rebuild the container — the <a href="/guides/repair-mp4-with-reference-file">method explained here</a>. This is the step that turns the .DAT back into your clip.</li>
+      </ol>
+
+      <div class="cta-box">
+        <h3>Client shoot on the line?</h3>
+        <p>StreamSalvage rebuilds unfinalized recordings locally from a reference clip — no uploading client footage anywhere, free preview, $29 one-time only if the repair works.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Expectations</h2>
+      <p>Frames buffered in the camera at the moment of the crash never reached the card — plan to lose the final seconds. Everything written before the interruption is normally recoverable, video and audio both. If the .DAT is tiny relative to the recording length (a few hundred KB for a 20-minute take), the write failed early and there's little to recover.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What is the .DAT file my Canon camera left on the card?</summary>
+          <p>It's the unfinalized remains of an interrupted recording. When a Canon body (R5 II, C70, and others) crashes or loses power mid-take, the encoded video data stays on the card without the container structure that would make it an MP4/MOV — surfaced as a .DAT file. Your footage is usually inside it.</p>
+        </details>
+        <details>
+          <summary>Can the Canon camera itself repair the .DAT file?</summary>
+          <p>Try it first: reinsert the card into the same body and power on. Canon bodies detect interrupted clips and may offer to recover them. If the camera repairs it, you get a normal playable file with no extra work.</p>
+        </details>
+        <details>
+          <summary>How do I convert a Canon .DAT file back to video on a PC?</summary>
+          <p>Copy it off the card, rename a copy to .mp4 (or .mov for C-series), and test it. If it won't play, use reference-file repair: a healthy clip from the same camera at the same settings provides the structural template to rebuild the container around the raw stream.</p>
+        </details>
+        <details>
+          <summary>Will renaming the .DAT to .MP4 alone fix it?</summary>
+          <p>Rarely — the extension change just lets players attempt to read it. Since the container was never finalized, most .DAT files still need their index rebuilt. Renaming is a free first test, not the fix.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/mdt-file-recovery">.MDT file recovery (Panasonic) →</a>
+        <a href="/guides/camera-died-while-recording">Camera died while recording →</a>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>
