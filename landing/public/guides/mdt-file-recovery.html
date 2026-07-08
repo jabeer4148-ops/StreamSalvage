@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>.MDT File Recovery: Rescue Footage After a Camera Power Loss</title>
+  <meta name="description" content="Panasonic and other cameras leave an .mdt file when power is lost mid-recording. What the file actually contains and how to turn it back into a playable video." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/mdt-file-recovery" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/mdt-file-recovery" />
+  <meta property="og:title" content=".MDT File Recovery: Rescue Footage After a Camera Power Loss" />
+  <meta property="og:description" content="What an .mdt file actually contains and how to turn it back into playable video." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content=".MDT File Recovery: Rescue Footage After a Camera Power Loss" />
+  <meta name="twitter:description" content="What an .mdt file contains and how to turn it back into playable video." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": ".MDT File Recovery: Rescue Footage After a Camera Power Loss",
+    "description": "What the .mdt file left by Panasonic and similar cameras contains after a power loss, and how to recover the footage inside it.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/mdt-file-recovery"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": ".MDT file recovery", "item": "https://www.streamsalvage.com/guides/mdt-file-recovery" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is an .mdt file on my camera's SD card?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It's the leftover of an interrupted recording. Cameras like Panasonic LUMIX models write video data to a temporary structure and finalize it into an MP4/MOV when recording stops. If power is lost first, the unfinalized data remains on the card — often with an .mdt extension — containing your actual footage without a playable container." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can the camera itself recover an .mdt file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Sometimes. Put the card back in the same camera and power it on — many models detect the unfinalized recording and offer to repair it. Try this before anything else; it's the manufacturer's own recovery path and it's free." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I recover an .mdt file on a PC?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Copy it off the card, then treat it as an unfinalized MP4: rename a copy to .mp4, try an FFmpeg stream copy, and if that fails use reference-file repair with a healthy clip from the same camera and settings. The raw frames are usually intact — they just need a rebuilt container." }
+      },
+      {
+        "@type": "Question",
+        "name": "Will I lose footage recovering an .mdt file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Usually only the last few seconds before power was lost — frames still in the camera's buffer that never reached the card. Everything written before the interruption is typically recoverable." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>.MDT file recovery</span>
+      </nav>
+
+      <p class="eyebrow">Pro workflow</p>
+      <h1>.MDT file recovery: rescue footage after a camera power loss</h1>
+      <p class="meta">Last updated July 8, 2026 · ~5 min read</p>
+
+      <p class="lead">Your camera lost power mid-take — cable tripped, battery died, body overheated — and instead of an MP4 there's a mysterious <code>.mdt</code> file on the card. Don't delete it and don't format the card: that file usually <em>is</em> your footage, one step away from being a video again.</p>
+
+      <h2>What an .mdt file actually is</h2>
+      <p>Cameras don't write a finished MP4 continuously. They stream encoded frames to the card and write the finalizing structures — the index, the container closure — when you press stop. Interrupt that (power loss on a Panasonic LUMIX GH-series body is the classic case) and the unfinalized data is left behind, often surfaced as an <code>.mdt</code> file. Inside is the real H.264/HEVC stream your sensor captured; what's missing is the container that makes players recognize it.</p>
+      <div class="callout warn">
+        <p><strong>First, protect the card:</strong> stop recording to it, don't format it, and copy the .mdt file (and a healthy clip from the same session) to your computer before attempting anything.</p>
+      </div>
+
+      <h2>Recovery steps, in order</h2>
+      <ol>
+        <li><strong>Let the camera try first.</strong> Reinsert the card into the <em>same</em> camera and power it on. Many bodies detect the unfinalized take and offer their own repair. If it works, you're done — this path is free and lossless.</li>
+        <li><strong>Copy everything to your PC.</strong> The .mdt file plus at least one healthy clip recorded with the same settings (resolution, frame rate, codec). That healthy clip matters — it's your reference.</li>
+        <li><strong>Rename a copy to .mp4 and test.</strong> Occasionally the file is closer to complete than expected. Try playing it in VLC and probing it with MediaInfo.</li>
+        <li><strong>Try an FFmpeg stream copy:</strong> <code>ffmpeg -i clip.mp4 -c copy fixed.mp4</code>. If FFmpeg reports <a href="/guides/ffmpeg-invalid-data-found">invalid data found</a>, the index is missing — expected for a power-loss file.</li>
+        <li><strong>Rebuild with the reference clip.</strong> The <a href="/guides/repair-mp4-with-reference-file">reference-file method</a> reconstructs the container from your healthy clip's structure. This is the step that turns the .mdt data back into playable video.</li>
+      </ol>
+
+      <h2>For working videographers</h2>
+      <p>If this was a client shoot — an interview, a ceremony, a one-time event — work only on copies and keep the original card untouched until you've verified the recovery. And going forward: dual-slot relay recording doesn't protect against power loss (both cards get unfinalized files), but a battery grip and locked power cables do.</p>
+
+      <div class="cta-box">
+        <h3>Rebuild the container locally — client footage never leaves your machine</h3>
+        <p>StreamSalvage repairs unfinalized recordings on your own PC using a reference clip from the same camera. Free preview of the result, $29 one-time, no upload — no client footage on third-party servers.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What is an .mdt file on my camera's SD card?</summary>
+          <p>It's the leftover of an interrupted recording. Cameras like Panasonic LUMIX models write video data to a temporary structure and finalize it into an MP4/MOV when recording stops. If power is lost first, the unfinalized data remains on the card — often with an .mdt extension — containing your actual footage without a playable container.</p>
+        </details>
+        <details>
+          <summary>Can the camera itself recover an .mdt file?</summary>
+          <p>Sometimes. Put the card back in the same camera and power it on — many models detect the unfinalized recording and offer to repair it. Try this before anything else; it's the manufacturer's own recovery path and it's free.</p>
+        </details>
+        <details>
+          <summary>How do I recover an .mdt file on a PC?</summary>
+          <p>Copy it off the card, then treat it as an unfinalized MP4: rename a copy to .mp4, try an FFmpeg stream copy, and if that fails use reference-file repair with a healthy clip from the same camera and settings. The raw frames are usually intact — they just need a rebuilt container.</p>
+        </details>
+        <details>
+          <summary>Will I lose footage recovering an .mdt file?</summary>
+          <p>Usually only the last few seconds before power was lost — frames still in the camera's buffer that never reached the card. Everything written before the interruption is typically recoverable.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+        <a href="/guides/moov-atom-not-found">"Moov atom not found": what it means →</a>
+        <a href="/guides/repair-mp4-without-uploading">Repair an MP4 without uploading it →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

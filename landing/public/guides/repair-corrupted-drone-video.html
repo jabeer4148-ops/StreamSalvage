@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>Drone Video Corrupted After a Crash? How to Recover DJI Footage</title>
+  <meta name="description" content="Drone hit a branch, lost power, and the last file won't play? The footage usually survives the crash even when the drone doesn't. Local recovery steps for DJI and others." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/repair-corrupted-drone-video" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/repair-corrupted-drone-video" />
+  <meta property="og:title" content="Drone Video Corrupted After a Crash? How to Recover DJI Footage" />
+  <meta property="og:description" content="The footage usually survives the crash even when the drone doesn't. Local recovery steps." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Drone Video Corrupted After a Crash? How to Recover DJI Footage" />
+  <meta name="twitter:description" content="The footage usually survives the crash even when the drone doesn't." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Drone Video Corrupted After a Crash? How to Recover DJI Footage",
+    "description": "Why a drone crash leaves the last video unfinalized, and how to recover the file locally with a reference clip from the same drone.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/repair-corrupted-drone-video"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Repair corrupted drone video", "item": "https://www.streamsalvage.com/guides/repair-corrupted-drone-video" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why is my drone's last video file corrupted after a crash?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The impact (or a battery ejected on impact) cut power while the drone was still writing the file. The index that makes an MP4 playable is written at the end of recording — so a mid-flight power loss leaves a large file that no player can open. The frames up to the impact are usually intact." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does renaming the drone video to .mov fix it?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. The extension doesn't change the file's structure. An unfinalized recording is missing its index regardless of what you call it. It needs structural repair — ideally the reference-file method with a healthy clip from the same drone." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can turning the drone back on repair the file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Sometimes. Some drones, like some cameras, detect an unfinalized file on power-up and finalize it. If the drone still powers on, reinsert the card and boot it before trying PC-based repair. If the drone is destroyed, go straight to reference-file repair on your computer." }
+      },
+      {
+        "@type": "Question",
+        "name": "What reference file should I use for DJI footage repair?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Any healthy clip from the same drone recorded with the same resolution, frame rate, and codec (DJI models often use HEVC at high resolutions). An earlier clip from the same flight or a previous flight on the same settings is ideal." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Repair corrupted drone video</span>
+      </nav>
+
+      <p class="eyebrow">Device guide</p>
+      <h1>Drone video corrupted after a crash? How to recover the footage</h1>
+      <p class="meta">Last updated July 8, 2026 · ~5 min read</p>
+
+      <p class="lead">Hit a branch, clipped a wall, battery ejected on impact — and the file of the flight (including the crash you'd love to see) is 3 GB of "unsupported format." The drone may be in pieces, but the footage usually isn't. Here's how to get it back.</p>
+
+      <h2>Why the crash kills the file, not the footage</h2>
+      <p>Drones write video continuously to the SD card but only finalize the file — writing the <a href="/guides/moov-atom-not-found">index</a> that makes it playable — when recording stops normally. An instant power loss means that final write never happens. Windows reports "format not supported" or <a href="/guides/error-0xc10100be">error 0xc10100be</a>; VLC refuses too. The raw frames up to the moment of impact are still sitting in the file.</p>
+
+      <div class="callout">
+        <p><strong>Skip the extension trick.</strong> Renaming <code>.mp4</code> to <code>.mov</code> is the most-tried and least-effective fix on drone forums. The container is unfinalized; the name is irrelevant.</p>
+      </div>
+
+      <h2>Recovery steps</h2>
+      <ol>
+        <li><strong>If the drone still powers on:</strong> reinsert the card and boot it. Some models detect the unfinalized file and repair it themselves — same principle as a stopped camera finalizing on restart. Also note: turning the drone off before stopping the recording causes the exact same corruption, no crash required.</li>
+        <li><strong>Copy files off the card</strong> — the broken file plus a healthy clip with the same settings (same resolution/frame rate; an earlier flight works).</li>
+        <li><strong>Try a stream copy:</strong> <code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code> — quick, occasionally sufficient.</li>
+        <li><strong>Rebuild with the reference clip</strong> via the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a>. DJI files are large and often HEVC — a local tool avoids uploading multi-gigabyte files to a web service.</li>
+      </ol>
+
+      <div class="cta-box">
+        <h3>Recover the flight — locally</h3>
+        <p>Drop the broken file and a healthy clip from the same drone into StreamSalvage. It rebuilds the index on your PC — no multi-GB upload, free preview, $29 only if your footage comes back.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>If every file on the card is corrupt</h2>
+      <p>That's a different problem: a failing or counterfeit SD card, not an interrupted recording. Budget drones (Snaptain-class) are especially sensitive to slow cards. Test with a known-good, genuine card; if files still corrupt on every flight, the drone's card interface is the suspect.</p>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Why is my drone's last video file corrupted after a crash?</summary>
+          <p>The impact (or a battery ejected on impact) cut power while the drone was still writing the file. The index that makes an MP4 playable is written at the end of recording — so a mid-flight power loss leaves a large file that no player can open. The frames up to the impact are usually intact.</p>
+        </details>
+        <details>
+          <summary>Does renaming the drone video to .mov fix it?</summary>
+          <p>No. The extension doesn't change the file's structure. An unfinalized recording is missing its index regardless of what you call it. It needs structural repair — ideally the reference-file method with a healthy clip from the same drone.</p>
+        </details>
+        <details>
+          <summary>Can turning the drone back on repair the file?</summary>
+          <p>Sometimes. Some drones, like some cameras, detect an unfinalized file on power-up and finalize it. If the drone still powers on, reinsert the card and boot it before trying PC-based repair. If the drone is destroyed, go straight to reference-file repair on your computer.</p>
+        </details>
+        <details>
+          <summary>What reference file should I use for DJI footage repair?</summary>
+          <p>Any healthy clip from the same drone recorded with the same resolution, frame rate, and codec (DJI models often use HEVC at high resolutions). An earlier clip from the same flight or a previous flight on the same settings is ideal.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-corrupted-gopro-video">GoPro video corrupted? How to repair it →</a>
+        <a href="/guides/error-0xc10100be">Error 0xc10100be explained →</a>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

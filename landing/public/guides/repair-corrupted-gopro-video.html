@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>GoPro Video Corrupted? How to Repair It (Even When SOS Repair Fails)</title>
+  <meta name="description" content="Battery popped out, card pulled too fast, or the camera froze — and now the GoPro MP4 won't play. Try SOS repair first, then fix the file locally on your PC." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/repair-corrupted-gopro-video" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/repair-corrupted-gopro-video" />
+  <meta property="og:title" content="GoPro Video Corrupted? How to Repair It (Even When SOS Repair Fails)" />
+  <meta property="og:description" content="Try GoPro's SOS repair first — and when it fails, fix the MP4 locally on your PC." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="GoPro Video Corrupted? How to Repair It (Even When SOS Repair Fails)" />
+  <meta name="twitter:description" content="Try SOS repair first — and when it fails, fix the MP4 locally." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "GoPro Video Corrupted? How to Repair It (Even When SOS Repair Fails)",
+    "description": "How to recover corrupted GoPro and action-cam MP4 files: built-in SOS repair, why it fails, and local reference-file repair.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/repair-corrupted-gopro-video"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Repair corrupted GoPro video", "item": "https://www.streamsalvage.com/guides/repair-corrupted-gopro-video" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does GoPro's built-in SOS repair work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "When a GoPro detects an unfinalized file on the card, it shows a repair icon (SOS). Insert the card and battery, power on, and press any button to let the camera finalize its own file. It works because the camera knows its exact recording parameters. Always try it before PC-based repair." }
+      },
+      {
+        "@type": "Question",
+        "name": "What if GoPro SOS repair doesn't fix the file?",
+        "acceptedAnswer": { "@type": "Answer", "text": "SOS repair fails when the damage is beyond a simple finalize — e.g. the battery popped out during a write, or the card was pulled mid-process. Copy the broken MP4 and a healthy clip with the same settings to your PC and use reference-file repair to rebuild the index." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why won't my GoPro video play on my computer at all?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Two possibilities: the file is fine but encoded in HEVC (install the HEVC extension or use VLC), or the file is unfinalized from an interrupted recording. If VLC can't play it either, it's corruption — the index is missing, not the codec." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do budget action cameras corrupt files more often than GoPros?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Off-brand action cams (Dragon Touch, Snaptain-class devices) corrupt files more frequently — weaker write handling, no SOS-style self-repair, and sensitivity to slow SD cards. The repair method is identical: a healthy reference clip from the same camera rebuilds the broken file." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Repair corrupted GoPro video</span>
+      </nav>
+
+      <p class="eyebrow">Device guide</p>
+      <h1>GoPro video corrupted? How to repair it — even when SOS repair fails</h1>
+      <p class="meta">Last updated July 8, 2026 · ~6 min read</p>
+
+      <p class="lead">The battery popped out on a hard landing, the card came out too fast, or the camera froze mid-record — and the last MP4 on the card won't play. GoPro footage is usually recoverable, and the first fix doesn't even need a computer.</p>
+
+      <h2>Step 1: let the GoPro repair itself (SOS repair)</h2>
+      <ol>
+        <li>Power the camera off and remove both the battery and the SD card.</li>
+        <li>Insert the battery, power on, then insert the SD card.</li>
+        <li>If the camera detects an unfinalized file, a repair icon appears — press any button to start.</li>
+      </ol>
+      <p>SOS repair works because the camera knows its own recording parameters exactly. When it works, the file plays perfectly. Try it before anything else.</p>
+      <div class="callout warn">
+        <p><strong>If the camera loops "repairing your file" endlessly</strong> (a known Hero 11 behavior on low battery), connect it to USB power and let it finish. Don't format the card to escape the loop — copy your files off first from a card reader.</p>
+      </div>
+
+      <h2>Step 2: check whether it's really corruption</h2>
+      <p>GoPros record HEVC by default at high resolutions. If the file transfers fine but Windows throws <a href="/guides/error-0xc00d5212">error 0xc00d5212</a> or "format not supported," test in VLC — a file that plays in VLC just needs the HEVC extension, not a repair.</p>
+
+      <h2>Step 3: repair the file on your PC</h2>
+      <p>If SOS repair failed or never triggered, and VLC can't play the file:</p>
+      <ol>
+        <li><strong>Copy the broken MP4 off the card</strong>, plus a healthy clip recorded with the same settings — same resolution and frame rate. Another run from the same session is ideal.</li>
+        <li><strong>Try a stream copy:</strong> <code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code>.</li>
+        <li><strong>Rebuild from the reference clip</strong> using the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a> — the healthy clip's structure becomes the template for reconstructing the broken file's missing index.</li>
+      </ol>
+
+      <div class="cta-box">
+        <h3>Fix the run the SOS repair couldn't</h3>
+        <p>Drop the broken GoPro file and a healthy clip into StreamSalvage. It rebuilds the index locally, previews the result free, and charges $29 only if your footage comes back.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Budget action cams (Dragon Touch, Snaptain &amp; co.)</h2>
+      <p>Off-brand action cameras corrupt files more often — weaker firmware write handling, no self-repair, and they choke on slow SD cards. The PC-side repair is identical: healthy reference clip from the same camera, rebuild the index. If <em>every</em> file on the card is corrupt, suspect the card, not the camera: test with a genuine Class 10/UHS-I card before blaming firmware.</p>
+
+      <h2>Preventing the next corrupt file</h2>
+      <ul>
+        <li>Use genuine, fast SD cards (fakes are the #1 cause of action-cam corruption).</li>
+        <li>Format the card <em>in the camera</em>, not on a computer.</li>
+        <li>Stop recording before powering off; never pull the card while the write light is on.</li>
+        <li>Start rides/runs with a battery that isn't about to die — low-voltage cutouts mid-write are exactly what unfinalizes files.</li>
+      </ul>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>How does GoPro's built-in SOS repair work?</summary>
+          <p>When a GoPro detects an unfinalized file on the card, it shows a repair icon (SOS). Insert the card and battery, power on, and press any button to let the camera finalize its own file. It works because the camera knows its exact recording parameters. Always try it before PC-based repair.</p>
+        </details>
+        <details>
+          <summary>What if GoPro SOS repair doesn't fix the file?</summary>
+          <p>SOS repair fails when the damage is beyond a simple finalize — e.g. the battery popped out during a write, or the card was pulled mid-process. Copy the broken MP4 and a healthy clip with the same settings to your PC and use reference-file repair to rebuild the index.</p>
+        </details>
+        <details>
+          <summary>Why won't my GoPro video play on my computer at all?</summary>
+          <p>Two possibilities: the file is fine but encoded in HEVC (install the HEVC extension or use VLC), or the file is unfinalized from an interrupted recording. If VLC can't play it either, it's corruption — the index is missing, not the codec.</p>
+        </details>
+        <details>
+          <summary>Do budget action cameras corrupt files more often than GoPros?</summary>
+          <p>Off-brand action cams (Dragon Touch, Snaptain-class devices) corrupt files more frequently — weaker write handling, no SOS-style self-repair, and sensitivity to slow SD cards. The repair method is identical: a healthy reference clip from the same camera rebuilds the broken file.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-corrupted-drone-video">Drone video corrupted after a crash? →</a>
+        <a href="/guides/error-0xc00d5212">Error 0xc00d5212: missing codec or corruption? →</a>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

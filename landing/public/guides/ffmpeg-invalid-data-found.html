@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>FFmpeg "Invalid Data Found When Processing Input": What It Means</title>
+  <meta name="description" content="FFmpeg throws 'invalid data found when processing input' on unfinalized MP4s. What the error means, the flags worth trying, and what to do when FFmpeg can't help." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found" />
+  <meta property="og:title" content="FFmpeg &quot;Invalid Data Found When Processing Input&quot;: What It Means" />
+  <meta property="og:description" content="The flags worth trying on a broken MP4 — and what to do when FFmpeg can't help." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="FFmpeg &quot;Invalid Data Found When Processing Input&quot;: What It Means" />
+  <meta name="twitter:description" content="The flags worth trying on a broken MP4 — and what to do when FFmpeg can't help." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "FFmpeg \"Invalid Data Found When Processing Input\": What It Means",
+    "description": "Why FFmpeg rejects unfinalized MP4 files, which recovery flags are worth trying, and when to switch to reference-file repair.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "FFmpeg invalid data found", "item": "https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does FFmpeg's 'invalid data found when processing input' mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "FFmpeg's demuxer couldn't parse the file: the structure it expected (a valid MP4 header and index) isn't there. On recordings that were interrupted, it almost always means the moov atom was never written, so FFmpeg has no map of the streams." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can FFmpeg repair an MP4 with a missing moov atom?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. FFmpeg needs a parseable input; it can't reconstruct a missing index. Flags like -err_detect ignore_err help only when the file is partially readable. For a truly unfinalized MP4 you need a reference-based tool that rebuilds the index from a healthy clip." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which FFmpeg flags are worth trying on a broken MP4?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Try a plain stream copy first (ffmpeg -i broken.mp4 -c copy out.mp4), then -err_detect ignore_err, and ffprobe to see what's readable. If every command returns 'invalid data found when processing input', stop — the container needs rebuilding, not decoding." }
+      },
+      {
+        "@type": "Question",
+        "name": "What should I use when FFmpeg can't read the file at all?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A reference-file repair tool. It takes a short healthy clip recorded with the same settings and uses its structure to rebuild the broken file's index. untrunc does this on the command line; StreamSalvage does it with a drag-and-drop GUI, free preview, and no upload." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>FFmpeg invalid data found</span>
+      </nav>
+
+      <p class="eyebrow">Error explained</p>
+      <h1>FFmpeg "invalid data found when processing input": what it actually means</h1>
+      <p class="meta">Last updated July 8, 2026 · ~6 min read</p>
+
+      <p class="lead">You pointed FFmpeg at a broken recording and got <code>Invalid data found when processing input</code>. You're already on the command line, so here's the short version: FFmpeg's demuxer can't parse the file, and if the recording was interrupted (OBS crash, Streamlabs BSOD, camera power loss), no decoding flag will change that. Here's what's worth trying — and when to stop.</p>
+
+      <h2>Why FFmpeg rejects the file</h2>
+      <p>FFmpeg reads an MP4 by first locating the <a href="/guides/moov-atom-not-found">moov atom</a> — the index describing every sample in the file. An interrupted recording never got its index written. FFmpeg finds <code>mdat</code> (the raw data) but no map, gives up, and prints <code>invalid data found when processing input</code>. The error is accurate from the demuxer's perspective and misleading from yours: the data is there, it's the structure that's missing.</p>
+
+      <h2>The commands worth trying (in order)</h2>
+      <ol>
+        <li><strong>Probe what's readable:</strong>
+          <p><code>ffprobe -v error -show_format -show_streams broken.mp4</code></p>
+          <p>If ffprobe sees streams, you have a partial index and a real chance with FFmpeg alone.</p></li>
+        <li><strong>Plain stream copy:</strong>
+          <p><code>ffmpeg -i broken.mp4 -c copy -avoid_negative_ts make_zero fixed.mp4</code></p>
+          <p>Works when only the tail of the file is damaged. Fast, lossless, always try it first.</p></li>
+        <li><strong>Tolerant read:</strong>
+          <p><code>ffmpeg -err_detect ignore_err -i broken.mp4 -c copy fixed.mp4</code></p>
+          <p>Ignores recoverable bitstream errors. Salvages files damaged mid-stream — one OBS user recovered footage up to the exact frame of an NVENC encoder crash this way.</p></li>
+        <li><strong>Faststart, for files that play but seek badly:</strong>
+          <p><code>ffmpeg -i input.mp4 -c copy -movflags faststart output.mp4</code></p>
+          <p>This relocates an existing moov atom; it cannot create a missing one.</p></li>
+      </ol>
+
+      <div class="callout warn">
+        <p><strong>When to stop:</strong> if every command above returns <code>invalid data found</code>, the moov atom doesn't exist. FFmpeg cannot rebuild what was never written — no flag combination changes this. You need reference-based reconstruction.</p>
+      </div>
+
+      <h2>The reference-file method (what actually works)</h2>
+      <p>Tools like <a href="/guides/untrunc-alternative">untrunc</a> take a healthy clip recorded with the same device and settings and use its structure as a template to rebuild the broken file's index — codec parameters, chunk layout, sample tables. See <a href="/guides/repair-mp4-with-reference-file">how reference-file repair works</a> for the full explanation.</p>
+
+      <div class="cta-box">
+        <h3>Reference repair without compiling untrunc</h3>
+        <p>StreamSalvage runs the same FFmpeg stream-copy first, then falls back to reference-guided reconstruction — drag, drop, preview free, $29 only if it works. 100% local.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What does FFmpeg's "invalid data found when processing input" mean?</summary>
+          <p>FFmpeg's demuxer couldn't parse the file: the structure it expected (a valid MP4 header and index) isn't there. On recordings that were interrupted, it almost always means the moov atom was never written, so FFmpeg has no map of the streams.</p>
+        </details>
+        <details>
+          <summary>Can FFmpeg repair an MP4 with a missing moov atom?</summary>
+          <p>No. FFmpeg needs a parseable input; it can't reconstruct a missing index. Flags like <code>-err_detect ignore_err</code> help only when the file is partially readable. For a truly unfinalized MP4 you need a reference-based tool that rebuilds the index from a healthy clip.</p>
+        </details>
+        <details>
+          <summary>Which FFmpeg flags are worth trying on a broken MP4?</summary>
+          <p>Try a plain stream copy first (<code>ffmpeg -i broken.mp4 -c copy out.mp4</code>), then <code>-err_detect ignore_err</code>, and ffprobe to see what's readable. If every command returns "invalid data found when processing input", stop — the container needs rebuilding, not decoding.</p>
+        </details>
+        <details>
+          <summary>What should I use when FFmpeg can't read the file at all?</summary>
+          <p>A reference-file repair tool. It takes a short healthy clip recorded with the same settings and uses its structure to rebuild the broken file's index. untrunc does this on the command line; StreamSalvage does it with a drag-and-drop GUI, free preview, and no upload.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+        <a href="/guides/untrunc-alternative">untrunc: repair an MP4 without the command line →</a>
+        <a href="/guides/fix-corrupted-obs-recording">How to fix a corrupted OBS recording →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>

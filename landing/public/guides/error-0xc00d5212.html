@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
+
+  <title>Error 0xc00d5212: "Missing Codec" Isn't Always a Codec Problem</title>
+  <meta name="description" content="Error 0xc00d5212 usually points to a missing HEVC codec — but on interrupted recordings it means the video stream is unreadable. How to tell, and how to fix both." />
+  <link rel="canonical" href="https://www.streamsalvage.com/guides/error-0xc00d5212" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.streamsalvage.com/guides/error-0xc00d5212" />
+  <meta property="og:title" content="Error 0xc00d5212: &quot;Missing Codec&quot; Isn't Always a Codec Problem" />
+  <meta property="og:description" content="Missing HEVC codec or a scrambled video stream? How to tell, and how to fix both locally." />
+  <meta property="og:site_name" content="StreamSalvage" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Error 0xc00d5212: &quot;Missing Codec&quot; Isn't Always a Codec Problem" />
+  <meta name="twitter:description" content="Missing HEVC codec or a scrambled stream? How to tell — and fix both locally." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Error 0xc00d5212: \"Missing Codec\" Isn't Always a Codec Problem",
+    "description": "How to diagnose Windows error 0xc00d5212 — missing HEVC codec vs. unreadable stream data — and repair the video locally.",
+    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
+    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
+    "datePublished": "2026-07-08",
+    "dateModified": "2026-07-08",
+    "mainEntityOfPage": "https://www.streamsalvage.com/guides/error-0xc00d5212"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.streamsalvage.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://www.streamsalvage.com/guides" },
+      { "@type": "ListItem", "position": 3, "name": "Error 0xc00d5212", "item": "https://www.streamsalvage.com/guides/error-0xc00d5212" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does error 0xc00d5212 mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Windows says a codec needed to play the video is missing. On healthy files it usually means HEVC/H.265 isn't installed. On files from an interrupted recording, it can mean the container is readable but the stream data inside is scrambled or truncated — actual corruption, not a codec gap." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I fix 0xc00d5212 if it's just the HEVC codec?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Install the 'HEVC Video Extensions' from the Microsoft Store, or simply play the file in VLC, which ships its own decoders. GoPro, DJI, and modern phone footage is commonly HEVC, which Windows doesn't decode out of the box." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do I get 0xc00d5212 on a recording that was interrupted?",
+        "acceptedAnswer": { "@type": "Answer", "text": "When a recording is cut off, the file may keep a partial header while the stream data is incomplete. Windows then misreports the unreadable stream as a missing codec. If VLC and MediaInfo also fail on the file, treat it as corruption and repair the structure." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can a corrupt file showing 0xc00d5212 be repaired locally?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Using a short healthy clip recorded with the same device and settings, the broken file's structure can be rebuilt on your own PC. StreamSalvage does this with a free preview and no upload." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #1D9E75; --danger: #E24B4A;
+      --neutral-50: #f8faf9; --neutral-100: #eef2f0; --neutral-200: #dde4e1;
+      --neutral-500: #64706b; --neutral-700: #33403a; --neutral-900: #121917;
+      --green-50: #ecfdf6; --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--neutral-50); }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--neutral-900); background: var(--neutral-50); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--primary); }
+    .wrap { width: min(100% - 32px, 680px); margin: 0 auto; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: 0; color: var(--neutral-900); }
+    h1 { font-size: clamp(1.9rem, 6vw, 3rem); line-height: 1.05; margin-bottom: 14px; }
+    h2 { font-size: clamp(1.4rem, 4.5vw, 1.95rem); line-height: 1.12; margin: 44px 0 14px; }
+    h3 { font-size: 1.1rem; line-height: 1.3; margin: 28px 0 8px; }
+    p { margin: 0 0 16px; color: var(--neutral-700); }
+    ul, ol { color: var(--neutral-700); margin: 0 0 16px; padding-left: 22px; }
+    li { margin-bottom: 8px; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--neutral-200); }
+    .topbar .wrap { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .brand { font-weight: 500; color: var(--neutral-900); text-decoration: none; }
+    .topbar nav a { color: var(--neutral-700); text-decoration: none; margin-left: 18px; font-size: 0.95rem; }
+    .article { padding: 40px 0 56px; }
+    .crumbs { font-size: 0.86rem; color: var(--neutral-500); margin-bottom: 22px; }
+    .crumbs a { color: var(--neutral-500); }
+    .eyebrow { margin: 0 0 14px; color: var(--primary); font-size: 0.82rem; font-weight: 500; text-transform: uppercase; }
+    .meta { color: var(--neutral-500); font-size: 0.88rem; margin-bottom: 30px; }
+    .lead { font-size: 1.12rem; color: var(--neutral-700); }
+    .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
+    .callout.warn { border-left-color: var(--danger); }
+    .callout p:last-child { margin-bottom: 0; }
+    code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
+    .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
+    .cta-box h3 { margin-top: 0; }
+    .cta { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; padding: 15px 22px; border-radius: 12px; background: var(--primary); color: var(--white); font-weight: 500; text-decoration: none; box-shadow: 0 12px 28px rgba(29, 158, 117, 0.24); transition: opacity 160ms ease; }
+    .cta:hover { opacity: 0.88; }
+    table { width: 100%; table-layout: fixed; border-spacing: 0; overflow: hidden; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); margin: 18px 0; }
+    th, td { width: 50%; padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--neutral-200); font-size: 0.95rem; }
+    th { font-weight: 500; color: var(--neutral-900); }
+    td { color: var(--neutral-700); }
+    th:first-child, td:first-child { background: var(--neutral-100); }
+    th:last-child, td:last-child { background: var(--green-50); }
+    tr:last-child td { border-bottom: 0; }
+    th + th, td + td { border-left: 1px solid var(--neutral-200); }
+    .faq-list { display: grid; gap: 12px; margin-top: 16px; }
+    details { border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white); }
+    summary { cursor: pointer; list-style: none; padding: 16px 44px 16px 16px; position: relative; font-weight: 500; color: var(--neutral-900); }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.3rem; }
+    details[open] summary::after { content: "-"; }
+    details p { padding: 0 16px 16px; margin: 0; font-size: 0.96rem; }
+    .related { margin-top: 18px; }
+    .related a { display: block; padding: 6px 0; }
+    footer { padding: 36px 0 44px; border-top: 1px solid var(--neutral-200); background: var(--neutral-50); color: var(--neutral-700); font-size: 0.92rem; margin-top: 48px; }
+    footer p { margin: 0 0 8px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 8px; }
+    .footer-links a { color: var(--neutral-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="/">StreamSalvage</a>
+      <nav aria-label="Primary"><a href="/guides">Guides</a><a href="/#download">Download</a></nav>
+    </div>
+  </header>
+
+  <main class="article">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>Error 0xc00d5212</span>
+      </nav>
+
+      <p class="eyebrow">Error explained</p>
+      <h1>Error 0xc00d5212: "missing codec" isn't always a codec problem</h1>
+      <p class="meta">Last updated July 8, 2026 · ~5 min read</p>
+
+      <p class="lead">Windows shows <code>0xc00d5212</code> — "a codec required to play this file isn't installed." Nine times out of ten that's true and the fix takes two minutes. But if the video came from a crashed recording or a camera that lost power, the "missing codec" is actually unreadable stream data, and no codec pack will fix it. Here's how to tell the difference.</p>
+
+      <h2>The common case: HEVC isn't installed</h2>
+      <p>GoPros, DJI drones, iPhones, and most modern Android phones record in <strong>HEVC (H.265)</strong> by default. Windows doesn't decode HEVC out of the box, so healthy footage throws 0xc00d5212 in Movies &amp; TV and Media Player.</p>
+      <ul>
+        <li><strong>Fastest fix:</strong> play the file in VLC — it ships its own decoders.</li>
+        <li><strong>System fix:</strong> install "HEVC Video Extensions" from the Microsoft Store.</li>
+        <li><strong>Editor fix:</strong> convert to H.264 with HandBrake if your editor rejects HEVC.</li>
+      </ul>
+
+      <h2>The corruption case: the stream itself is unreadable</h2>
+      <p>If the file also fails in VLC, or MediaInfo shows no video track at all, the problem isn't a codec — the stream data or the file's index is damaged. This happens when:</p>
+      <ul>
+        <li>the camera lost power or overheated mid-recording,</li>
+        <li>the recorder (OBS, Streamlabs, a phone app) crashed before finalizing,</li>
+        <li>the SD card was pulled before the camera finished writing,</li>
+        <li>the file was truncated during a transfer.</li>
+      </ul>
+      <div class="callout">
+        <p><strong>Quick diagnosis:</strong> open the file in VLC and check it with MediaInfo. Plays in VLC → install HEVC. Fails everywhere and MediaInfo can't see the tracks → structural corruption; repair the file, don't hunt for codecs.</p>
+      </div>
+
+      <h2>Repairing the corrupt case</h2>
+      <ol>
+        <li><strong>Duplicate the file</strong> and work on the copy.</li>
+        <li><strong>Try a stream copy:</strong> <code>ffmpeg -i broken.mp4 -c copy fixed.mp4</code>. If FFmpeg reports <a href="/guides/ffmpeg-invalid-data-found">"invalid data found when processing input"</a>, the index is gone.</li>
+        <li><strong>Rebuild from a reference clip</strong> — a short healthy recording from the same device and settings. See the <a href="/guides/repair-mp4-with-reference-file">reference-file method</a>.</li>
+      </ol>
+
+      <div class="cta-box">
+        <h3>Repair the file, skip the codec hunt</h3>
+        <p>StreamSalvage rebuilds interrupted recordings on your own PC from a 10-second reference clip. Preview the repair free, pay $29 only if it works. Nothing is uploaded.</p>
+        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>What does error 0xc00d5212 mean?</summary>
+          <p>Windows says a codec needed to play the video is missing. On healthy files it usually means HEVC/H.265 isn't installed. On files from an interrupted recording, it can mean the container is readable but the stream data inside is scrambled or truncated — actual corruption, not a codec gap.</p>
+        </details>
+        <details>
+          <summary>How do I fix 0xc00d5212 if it's just the HEVC codec?</summary>
+          <p>Install the "HEVC Video Extensions" from the Microsoft Store, or simply play the file in VLC, which ships its own decoders. GoPro, DJI, and modern phone footage is commonly HEVC, which Windows doesn't decode out of the box.</p>
+        </details>
+        <details>
+          <summary>Why do I get 0xc00d5212 on a recording that was interrupted?</summary>
+          <p>When a recording is cut off, the file may keep a partial header while the stream data is incomplete. Windows then misreports the unreadable stream as a missing codec. If VLC and MediaInfo also fail on the file, treat it as corruption and repair the structure.</p>
+        </details>
+        <details>
+          <summary>Can a corrupt file showing 0xc00d5212 be repaired locally?</summary>
+          <p>Yes. Using a short healthy clip recorded with the same device and settings, the broken file's structure can be rebuilt on your own PC. StreamSalvage does this with a free preview and no upload.</p>
+        </details>
+      </div>
+
+      <div class="related">
+        <h3>Related guides</h3>
+        <a href="/guides/error-0xc00d36c4">Error 0xc00d36c4 explained →</a>
+        <a href="/guides/repair-corrupted-gopro-video">GoPro video corrupted? How to repair it →</a>
+        <a href="/guides/repair-mp4-with-reference-file">Repair an MP4 with a reference file →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>StreamSalvage · Windows · $29 one-time · no subscription</p>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/guides">Guides</a>
+        <a href="/#download">Download</a>
+        <a href="mailto:support@streamsalvage.com">support@streamsalvage.com</a>
+      </nav>
+      <p>© 2026 StreamSalvage. Built by a streamer, for streamers.</p>
+    </div>
+  </footer>
+</body>
+</html>
