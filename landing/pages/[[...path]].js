@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
+// CONTENT_VERSION: bump this whenever files in public/ change, so Vercel's
+// build cache re-traces the public/ directory into the serverless bundle.
+// Stale traces caused new guide pages to 404 in production (2026-07-08).
+export const CONTENT_VERSION = '2026-07-08-phase2';
+
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
 function isSafeSegment(segment) {
