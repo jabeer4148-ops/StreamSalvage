@@ -153,6 +153,10 @@
       <p class="lead">You try to open an MP4 and get <code>moov atom not found</code> — in a player, in FFmpeg, or in a script. It looks fatal, but in most cases your footage is still there. This explains exactly what the error means, why it happens, and how to repair the file on your own PC.</p>
 
       <h2>What the moov atom is</h2>
+      <figure style="margin: 0 0 18px;">
+        <img src="/guides/img/mp4-moov-atom-structure.svg" alt="MP4 file structure diagram: healthy file with moov atom index vs interrupted recording with moov atom not found" width="680" height="300" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white);" />
+        <figcaption class="sub" style="font-size: 0.85rem; color: var(--neutral-500); margin-top: 6px;">An interrupted recording keeps its frames (mdat) — only the index (moov atom) is missing.</figcaption>
+      </figure>
       <p>The <strong>moov atom</strong> is a small block of metadata inside every MP4/MOV file. It's the index a player reads first: it defines the timescale, the duration, and the exact location of every audio and video frame. Without it, a player has the raw data but no map to play it — so it reports <code>moov atom not found</code>.</p>
       <div class="callout">
         <p><strong>Key point:</strong> "moov atom not found" almost never means your footage is gone. It means the index is missing. The frames are usually still sitting in the file, unreadable only because nothing points to them.</p>

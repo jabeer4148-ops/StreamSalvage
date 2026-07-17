@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 260" width="680" height="260" role="img" aria-label="Flow diagram of reference-file MP4 repair: a broken recording plus a healthy reference clip with the same settings are combined to rebuild the missing index and produce a playable video">
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .title { font-size: 14px; font-weight: 600; fill: #121917; }
+    .sub { font-size: 12px; fill: #64706b; }
+    .arrow { stroke: #64706b; stroke-width: 2; fill: none; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#64706b"/>
+    </marker>
+  </defs>
+  <rect width="680" height="260" fill="#f8faf9"/>
+
+  <rect x="30" y="30" width="200" height="76" rx="10" fill="#fff" stroke="#E24B4A" stroke-width="2"/>
+  <text x="130" y="62" text-anchor="middle" class="title">Broken recording</text>
+  <text x="130" y="84" text-anchor="middle" class="sub">frames intact, index missing</text>
+
+  <rect x="30" y="150" width="200" height="76" rx="10" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+  <text x="130" y="182" text-anchor="middle" class="title">Reference clip (10 s)</text>
+  <text x="130" y="204" text-anchor="middle" class="sub">same device &amp; settings</text>
+
+  <path class="arrow" d="M232 68 C300 68 300 118 336 122"/>
+  <path class="arrow" d="M232 188 C300 188 300 138 336 134"/>
+
+  <rect x="342" y="92" width="160" height="76" rx="10" fill="#eef2f0" stroke="#dde4e1"/>
+  <text x="422" y="124" text-anchor="middle" class="title">Rebuild index</text>
+  <text x="422" y="146" text-anchor="middle" class="sub">reference = structural template</text>
+
+  <path class="arrow" d="M504 130 L560 130"/>
+
+  <rect x="566" y="92" width="90" height="76" rx="10" fill="#ecfdf6" stroke="#1D9E75" stroke-width="2"/>
+  <text x="611" y="124" text-anchor="middle" class="title" fill="#1D9E75">Playable</text>
+  <text x="611" y="146" text-anchor="middle" class="sub">video restored</text>
+</svg>

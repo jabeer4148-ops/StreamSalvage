@@ -152,6 +152,11 @@
 
       <p class="lead">Every serious MP4 repair tool — untrunc, recover_mp4, Grau's Video Repair, StreamSalvage — is built on the same idea: use a <strong>healthy clip with identical settings</strong> as a template to rebuild a broken file's missing index. Understand the method once and every tool makes sense.</p>
 
+      <figure style="margin: 0 0 18px;">
+        <img src="/guides/img/reference-file-repair-flow.svg" alt="Reference file MP4 repair flow: broken recording plus healthy reference clip rebuild the missing index into a playable video" width="680" height="260" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid var(--neutral-200); border-radius: 8px; background: var(--white);" />
+        <figcaption style="font-size: 0.85rem; color: var(--neutral-500); margin-top: 6px;">The reference clip's intact structure becomes the template for rebuilding the broken file's index.</figcaption>
+      </figure>
+
       <h2>Why a broken MP4 needs a template</h2>
       <p>An interrupted recording is missing its <a href="/guides/moov-atom-not-found">moov atom</a> — the index describing where every frame sits, how the streams interleave, and what the codec parameters are. The raw frames are still in the file, but there are many valid ways to interpret raw H.264/HEVC data, and guessing wrong produces garbage. A reference clip removes the guesswork: it was written by the same encoder with the same settings, so its structure tells the repair tool exactly how the broken file's data is laid out.</p>
 

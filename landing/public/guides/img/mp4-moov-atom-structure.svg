@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" width="680" height="300" role="img" aria-label="Diagram comparing a healthy MP4 file with a moov atom index to a corrupted MP4 missing the moov atom after an interrupted recording">
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .label { font-size: 15px; font-weight: 600; fill: #121917; }
+    .box-label { font-size: 14px; fill: #121917; }
+    .sub { font-size: 12px; fill: #64706b; }
+  </style>
+  <rect width="680" height="300" fill="#f8faf9"/>
+
+  <!-- Healthy MP4 -->
+  <text x="40" y="36" class="label">Healthy MP4 — plays everywhere</text>
+  <rect x="40" y="52" width="70" height="60" rx="6" fill="#eef2f0" stroke="#dde4e1"/>
+  <text x="75" y="86" text-anchor="middle" class="box-label">ftyp</text>
+  <rect x="118" y="52" width="330" height="60" rx="6" fill="#eef2f0" stroke="#dde4e1"/>
+  <text x="283" y="80" text-anchor="middle" class="box-label">mdat — your video &amp; audio frames</text>
+  <text x="283" y="99" text-anchor="middle" class="sub">written continuously while recording</text>
+  <rect x="456" y="52" width="120" height="60" rx="6" fill="#ecfdf6" stroke="#1D9E75" stroke-width="2"/>
+  <text x="516" y="80" text-anchor="middle" class="box-label" fill="#1D9E75">moov atom</text>
+  <text x="516" y="99" text-anchor="middle" class="sub">the index — written at stop</text>
+
+  <!-- Corrupted MP4 -->
+  <text x="40" y="186" class="label">Interrupted recording — "moov atom not found"</text>
+  <rect x="40" y="202" width="70" height="60" rx="6" fill="#eef2f0" stroke="#dde4e1"/>
+  <text x="75" y="236" text-anchor="middle" class="box-label">ftyp</text>
+  <rect x="118" y="202" width="330" height="60" rx="6" fill="#eef2f0" stroke="#dde4e1"/>
+  <text x="283" y="230" text-anchor="middle" class="box-label">mdat — frames still intact</text>
+  <text x="283" y="249" text-anchor="middle" class="sub">everything up to the crash survived</text>
+  <rect x="456" y="202" width="120" height="60" rx="6" fill="none" stroke="#E24B4A" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="516" y="230" text-anchor="middle" class="box-label" fill="#E24B4A">missing</text>
+  <text x="516" y="249" text-anchor="middle" class="sub">crash — index never written</text>
+</svg>
