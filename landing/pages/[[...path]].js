@@ -4,7 +4,7 @@ import path from 'path';
 // CONTENT_VERSION: bump this whenever files in public/ change, so Vercel's
 // build cache re-traces the public/ directory into the serverless bundle.
 // Stale traces caused new guide pages to 404 in production (2026-07-08).
-export const CONTENT_VERSION = '2026-09-26-gsc';
+export const CONTENT_VERSION = '2026-10-07-favicon';
 
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
