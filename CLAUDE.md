@@ -19,7 +19,7 @@ src/                      React frontend
     VideoPreview.tsx       Preview repaired output
     ExportPanel.tsx        Save + license validation UI
 
-src-tauri/src/main.rs     Rust backend — all 5 Tauri commands
+src-tauri/src/main.rs     Rust backend — all 8 Tauri commands
 src-tauri/tauri.conf.json App config (780×620 fixed window, ffmpeg sidecar)
 ```
 
@@ -36,13 +36,14 @@ src-tauri/tauri.conf.json App config (780×620 fixed window, ffmpeg sidecar)
 |---|---|
 | `repair_no_reference` | FFmpeg stream copy, single attempt |
 | `repair_with_reference` | 3-step reference-guided repair |
-| `validate_license` | Lemon Squeezy `/v1/licenses/validate` |
+| `validate_license` | POST `{ licenseKey }` to `https://streamsalvage.com/api/validate-license` |
+| `get_stored_license` / `save_stored_license` / `clear_stored_license` | Read / write / delete `%APPDATA%\StreamSalvage\license.json` |
 | `open_file_in_player` | `cmd /c start` on Windows |
 | `save_repaired_file` | `std::fs::copy` to user destination |
 
 ### Key notes
 
-- License validation uses Lemon Squeezy. `LS_PRODUCT_ID` env var must be set for production; defaults to `"YOUR_PRODUCT_ID"`.
+- Payments: Stripe Checkout from the landing site (`landing/pages/api/create-checkout.js`). The Stripe webhook (`api/webhook.js`) generates a `SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX` key, stores it in Upstash Redis and emails it via Brevo. The app validates keys against `api/validate-license.js`. No payment secrets are compiled into the app; `STREAMSALVAGE_LICENSE_API_URL` (build time) can override the endpoint. Debug builds without it accept any `TEST-` key.
 - Output file is written next to the broken file as `{stem}_recovered.mp4`.
 - Progress bar during repair is simulated (90% over 3 s); jumps to 100% on success.
 

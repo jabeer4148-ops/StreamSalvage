@@ -218,6 +218,19 @@ JS return:      Promise<boolean>
 
 ---
 
+### `get_stored_license` / `save_stored_license` / `clear_stored_license`
+
+```
+JS call:        invoke('get_stored_license') → Promise<string | null>
+                invoke('save_stored_license', { licenseKey: string })
+                invoke('clear_stored_license')
+File:           %APPDATA%\StreamSalvage\license.json   { "licenseKey": "..." }
+```
+
+On startup `useRepair` reads the stored key and re-validates it; an invalid key is cleared.
+
+---
+
 ### `open_file_in_player`
 
 ```
@@ -287,30 +300,30 @@ JS return:      Promise<void>
 
 ## 5. Environment Variables
 
+**Desktop app (build time, optional):**
+
 | Variable | Required? | Default | Set by | Description |
 |---|---|---|---|---|
-| `LEMON_SQUEEZY_API_KEY` | Production only | `""` (empty string) | CI/CD build env or `.env` (via build.rs) | Lemon Squeezy API key for license validation. When empty, `TEST-` prefix keys validate as true. |
-
-**How the key is passed:**
+| `STREAMSALVAGE_LICENSE_API_URL` | No | `https://streamsalvage.com/api/validate-license` | Build env (passed through `build.rs`) | Override for the license validation endpoint. Read with `option_env!()`, so it is fixed at compile time. In debug builds, leaving it unset enables the `TEST-` key bypass. |
 
 `build.rs`:
 ```rust
-if let Ok(key) = std::env::var("LEMON_SQUEEZY_API_KEY") {
-    println!("cargo:rustc-env=LEMON_SQUEEZY_API_KEY={}", key);
+if let Ok(endpoint) = std::env::var("STREAMSALVAGE_LICENSE_API_URL") {
+    println!("cargo:rustc-env=STREAMSALVAGE_LICENSE_API_URL={}", endpoint);
 }
 ```
 
-`main.rs` at runtime:
-```rust
-let api_key = std::env::var("LEMON_SQUEEZY_API_KEY").unwrap_or_else(|_| "".to_string());
-```
+No payment or API secrets are compiled into the app.
 
-⚠️ ASSUMPTION: `cargo:rustc-env` causes the variable to be available via `env!()` macro at compile time, but `std::env::var()` reads the *process* environment at runtime. In practice, the key embedded via `cargo:rustc-env` is **not** accessible via `std::env::var()` in the running binary — only via the `env!()` macro. The current code uses `std::env::var()`, which means it reads the runtime process environment. This is likely unintentional and should be changed to use `env!("LEMON_SQUEEZY_API_KEY", "")` for compile-time embedding, or documented as requiring an environment variable set in the deployment.
+**Landing site API (Vercel env vars):**
 
-**.env.example:**
-```
-LEMON_SQUEEZY_API_KEY=your_lemon_squeezy_api_key_here
-```
+| Variable | Used by | Purpose |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | `create-checkout.js`, `webhook.js` | Stripe API |
+| `STRIPE_PRICE_ID` | `create-checkout.js` | The $29 one-time price |
+| `STRIPE_WEBHOOK_SECRET` | `webhook.js` | Verifies Stripe webhook signatures |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | `webhook.js`, `validate-license.js` | Upstash Redis license store |
+| `BREVO_API_KEY` | `webhook.js` | Sends the license email |
 
 ---
 
@@ -323,6 +336,7 @@ LEMON_SQUEEZY_API_KEY=your_lemon_squeezy_api_key_here
 | Read: reference file (stream) | FFmpeg subprocess | User-selected path | During `repair_with_reference` Strategy 2+3 |
 | Write: recovered file | FFmpeg subprocess | `{broken_dir}/{stem}_recovered.mp4` | During all repair commands |
 | Write: exported file | Rust (`std::fs::copy`) | User-chosen path (save dialog) | `save_repaired_file` |
+| Read/write/delete: license | Rust (`std::fs`) | `%APPDATA%\StreamSalvage\license.json` | App start, after a key validates, when a stored key turns invalid |
 
 **Key invariant:** The app itself never reads the video data — only FFmpeg does. Rust only reads file metadata (size check) and calls `std::fs::copy` for the export. The broken and reference files are passed as string paths to FFmpeg as command-line arguments.
 
@@ -337,54 +351,64 @@ The recovered file is always written adjacent to the broken file, regardless of 
 
 ## 7. External API Contracts
 
-### Lemon Squeezy License Validation
+### Purchase → license key (landing site, Stripe)
 
 ```
-Endpoint:     POST https://api.lemonsqueezy.com/v1/licenses/validate
-Headers:
-  Authorization:  Bearer {LEMON_SQUEEZY_API_KEY}
-  Accept:         application/json
-  Content-Type:   application/json
+Site "Buy" button → POST /api/create-checkout
+  → Stripe Checkout session (mode: payment, price STRIPE_PRICE_ID)
+  → success_url: /success/?session_id={CHECKOUT_SESSION_ID}   cancel_url: /#download
 
-Request body:
-{
-  "license_key": "<user-entered key>",
-  "instance_name": "StreamSalvage-Desktop"
-}
-
-Response (success):
-{
-  "valid": true,
-  ... (other Lemon Squeezy fields, ignored)
-}
-
-Response (invalid key):
-{
-  "valid": false,
-  ...
-}
+Stripe → POST /api/webhook   (event: checkout.session.completed, signature-verified)
+  → key = "SS-" + 4 × 8 uppercase hex chars
+  → Redis  license:{key}   = { email, sessionId, createdAt, activationCount: 0 }
+  → Redis  session:{id}    = key   (30-day TTL, de-duplicates webhook retries)
+  → Brevo email from support@streamsalvage.com with the key
 ```
+
+Only `checkout.session.completed` is handled. Refunds do not revoke keys.
+
+### License validation (app → landing site)
+
+```
+Endpoint:     POST https://streamsalvage.com/api/validate-license
+              (override at build time: STREAMSALVAGE_LICENSE_API_URL)
+Headers:      Accept: application/json, Content-Type: application/json
+Auth:         none
+Request body: { "licenseKey": "<user-entered key>" }
+
+Server: trims + uppercases the key, looks up license:{key} in Redis,
+        increments activationCount and sets lastActivated on every successful check.
+
+200 valid:    { "valid": true, "email": "...", "activationCount": n }
+200 invalid:  { "valid": false, "error": "Invalid license key" }
+400:          { "valid": false, "error": "License key required" }
+500:          { "valid": false, "error": "Server error" }
+```
+
+The bare domain redirects to `www` with a method-preserving redirect, so the POST and its body survive (checked 2026-10-07).
 
 **Parsing logic:**
 ```rust
 let json: serde_json::Value = response.json().await...;
 Ok(json["valid"].as_bool().unwrap_or(false))
 ```
-Only `json["valid"]` is read. All other response fields are ignored. If `valid` is missing, null, or not a bool, defaults to `false`.
+Only `json["valid"]` is read. If it is missing, null, or not a bool, the result is `false`.
 
 **Error handling matrix:**
 
 | Condition | Rust return | JS outcome | User sees |
 |---|---|---|---|
-| `LEMON_SQUEEZY_API_KEY` empty | `Ok(key.starts_with("TEST-"))` | `true` or `false` | Validation passes for TEST- keys |
-| Network error | `Err("Network error during validation: {e}")` | Promise rejects | "Could not verify license - check your internet connection" |
+| Debug build, no endpoint override | `Ok(key.starts_with("TEST-"))` | `true` or `false` | Validation passes for TEST- keys |
+| Network error | `Err("Network error: {e}")` | Promise rejects | "Could not verify license - check your internet connection" |
 | HTTP non-2xx | `Ok(false)` | `false` | "License key not recognized..." |
 | `valid: true` in JSON | `Ok(true)` | `true` | License verified, export unlocked |
 | `valid: false` in JSON | `Ok(false)` | `false` | "License key not recognized..." |
-| JSON parse error | `Err("Parse error: {e}")` | Promise rejects | "Could not verify license..." |
+| JSON parse error | `Err("Response parse error: {e}")` | Promise rejects | "Could not verify license..." |
 
-**Checkout URL** (hardcoded in `ExportPanel.tsx`, line 98):
+Note: `activationCount` grows on every app launch that re-validates a stored key, so it counts launches, not installs. No activation limit is enforced.
+
+**Buy link** (in `ExportPanel.tsx`):
 ```
-https://streamsalvage.lemonsqueezy.com/buy/
+https://streamsalvage.com/#download
 ```
-This is the live Lemon Squeezy store link for purchasing StreamSalvage.
+Opens the site, whose Buy button starts Stripe Checkout.

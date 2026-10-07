@@ -80,17 +80,17 @@
 
 13. Step: EXPORT — License input screen
     └── Amber box: "Enter the license key from your purchase email"
-    └── Checkout link: https://streamsalvage.lemonsqueezy.com/buy/
+    └── Buy link: https://streamsalvage.com/#download (site Buy button → Stripe Checkout)
     └── License key input field (monospace, auto-uppercase)
     └── "Verify license key" button (disabled until input non-empty)
-    └── Trust line: "Key is verified locally - never stored on our servers"
+    └── Trust line: "Checked once with streamsalvage.com, then remembered on this PC"
 
-14. User purchases at Lemon Squeezy → receives key by email
+14. User buys via Stripe Checkout on streamsalvage.com → Stripe webhook generates a `SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX` key → key emailed via Brevo
     └── Types/pastes key into input field
     └── Clicks "Verify license key" (or presses Enter)
     └── handleCheckLicense() → setChecking(true)
         → validateLicense(key) → invoke('validate_license', { licenseKey })
-        → Rust: POST https://api.lemonsqueezy.com/v1/licenses/validate
+        → Rust: POST https://streamsalvage.com/api/validate-license  { "licenseKey": key }
         └─ [Valid] → dispatch(LICENSE_VALID) → exportStep = 'ready'
         └─ [Invalid] → setError("License key not recognized...") → stays on license step
 
@@ -273,7 +273,7 @@ ExportPanel has its own local state machine (`ExportStep`):
 | Element | Behavior |
 |---|---|
 | Amber unlock box | "Enter the license key from your purchase email" + checkout link |
-| Checkout link | `https://streamsalvage.lemonsqueezy.com/buy/` opens in browser |
+| Buy link | `https://streamsalvage.com/#download` opens in browser (site → Stripe Checkout) |
 | License key input | Monospace font, auto-uppercase on change, Enter key submits |
 | "Verify license key" button | Disabled when input empty or `checking === true`; shows "Verifying..." during check |
 | Error text | Shows on invalid key; replaced by trust text when no error |
@@ -311,7 +311,7 @@ ExportPanel has its own local state machine (`ExportStep`):
 | Same file error | `repair_with_reference` checks `broken_path == reference_path` | "Broken file and reference file cannot be the same file." | REPAIR_FAILED → returns to REFERENCE |
 | FFmpeg not found | `get_ffmpeg_path()` exhausts all 4 search strategies | "FFmpeg binary not found. Tried multiple locations. Please ensure src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe exists and Git LFS files are pulled (run: git lfs pull)" | Result::Err → JS catches, REPAIR_FAILED → REFERENCE |
 | Repair failed (FFmpeg) | All strategies produce output < 1,024 bytes or non-zero exit | "FFmpeg stream copy could not recover this file." (no-ref) or "Could not reconstruct file. The recording may be too severely corrupted." (with-ref) | REPAIR_FAILED → REFERENCE; error shown in red banner; user can try with reference or try again |
-| License key not recognized | Lemon Squeezy returns `valid: false` or HTTP non-2xx | "License key not recognized. Check your purchase email from Lemon Squeezy. Keys look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" | Stays on license exportStep; user re-enters key |
+| License key not recognized | `/api/validate-license` returns `valid: false` or HTTP non-2xx | "License key not recognized. Check your StreamSalvage purchase email. Keys look like: SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" | Stays on license exportStep; user re-enters key |
 | Network error on validation | `reqwest` network error | "Could not verify license - check your internet connection and try again." | Stays on license exportStep; user retries |
 | Export failed / cancelled | `saveRepairedFile` throws or save dialog cancelled | "Export failed - the save dialog may have been cancelled, or the destination folder may not be writable. Try again." | setExportStep('ready') → user tries save again |
 | Preview file path missing | `repairedFilePath === null` on PREVIEW render | "Repair completed but output file path is missing. Please restart and try again." | Manual restart required |

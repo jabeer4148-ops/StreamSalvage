@@ -34,6 +34,8 @@ Version: 1.0.0
 │  ├── repair_no_reference(app, broken_path)                      │
 │  ├── repair_with_reference(app, broken_path, reference_path)    │
 │  ├── validate_license(license_key)                              │
+│  ├── get_stored_license() / save_stored_license(license_key)    │
+│  ├── clear_stored_license()                                     │
 │  ├── open_file_in_player(path)                                  │
 │  └── save_repaired_file(source_path, destination_path)          │
 │                                                                 │
@@ -45,8 +47,8 @@ Version: 1.0.0
            │                                │
            ▼                                ▼
 ┌──────────────────────┐    ┌───────────────────────────────────┐
-│ FFmpeg subprocess    │    │ Lemon Squeezy API                 │
-│ (bundled binary)     │    │ POST /v1/licenses/validate        │
+│ FFmpeg subprocess    │    │ streamsalvage.com API             │
+│ (bundled binary)     │    │ POST /api/validate-license        │
 │                      │    │ (validate_license command only)   │
 │ binaries/            │    └───────────────────────────────────┘
 │ ffmpeg-x86_64-       │
@@ -72,9 +74,9 @@ ExportPanel.tsx
             └── validateLicense(key)  [tauriCommands.ts]
                  └── invoke('validate_license', { licenseKey })
                       └── validate_license(license_key)  [Rust]
-                           ├── If LEMON_SQUEEZY_API_KEY is empty:
+                           ├── Debug build and no STREAMSALVAGE_LICENSE_API_URL:
                            │    return Ok(license_key.starts_with("TEST-"))
-                           └── POST https://api.lemonsqueezy.com/v1/licenses/validate
+                           └── POST https://streamsalvage.com/api/validate-license  { licenseKey }
                                 └── json["valid"].as_bool() → bool → JS → dispatch(LICENSE_VALID/INVALID)
 ```
 
@@ -106,7 +108,9 @@ ExportPanel.tsx
 | Rust crate: UUID | uuid | ^1 (v4 feature; in Cargo.toml, unused in main.rs) |
 | Build script | tauri-build | ^2 |
 | Video processing | FFmpeg static binary | ffmpeg-x86_64-pc-windows-msvc.exe (Git LFS) |
-| Payments | Lemon Squeezy | API v1 |
+| Payments | Stripe Checkout (landing site API) | `stripe` npm SDK |
+| License store | Upstash Redis (Vercel KV) | `@upstash/redis` |
+| License email | Brevo transactional email | API v3 |
 
 ---
 
@@ -193,11 +197,11 @@ Returns:   bool
 ```
 
 **Business logic:**
-1. Read `LEMON_SQUEEZY_API_KEY` from runtime environment (`std::env::var`)
-2. If empty: return `Ok(license_key.starts_with("TEST-"))` (dev bypass)
-3. If set: POST to `https://api.lemonsqueezy.com/v1/licenses/validate`
-   - Headers: `Authorization: Bearer {api_key}`, `Accept: application/json`, `Content-Type: application/json`
-   - Body: `{ "license_key": "<key>", "instance_name": "StreamSalvage-Desktop" }`
+1. Read the compile-time `STREAMSALVAGE_LICENSE_API_URL` (`option_env!`)
+2. If this is a debug build and it is empty: return `Ok(license_key.starts_with("TEST-"))` (dev bypass)
+3. POST to the configured endpoint, or `https://streamsalvage.com/api/validate-license` by default
+   - Headers: `Accept: application/json`, `Content-Type: application/json` (no auth)
+   - Body: `{ "licenseKey": "<key>" }`
 4. If HTTP response is not 2xx: return `Ok(false)`
 5. Parse JSON body: return `json["valid"].as_bool().unwrap_or(false)`
 
@@ -282,8 +286,8 @@ Returns:   ()
 | `REPAIR_SUCCESS` | FFmpeg returns success | `repairing` → `preview` | `repairedFilePath = outputPath`, `repairProgress = 100`, `repairSuccess = true` |
 | `REPAIR_FAILED` | FFmpeg returns failure or throws | `repairing` → `reference` | `repairError = error`, `repairProgress = 0`, log appended |
 | `SHOW_EXPORT` | User clicks "Unlock full video →" | `preview` → `export` | `showExport = true` |
-| `LICENSE_VALID` | Lemon Squeezy returns `valid: true` | any → `export` | `licenseKey = key`, `licenseValid = true`, `showExport = true` |
-| `LICENSE_INVALID` | Lemon Squeezy returns `valid: false` | `export` → `export` | `licenseValid = false` |
+| `LICENSE_VALID` | `/api/validate-license` returns `valid: true` | any → `export` | `licenseKey = key`, `licenseValid = true`, `showExport = true` |
+| `LICENSE_INVALID` | `/api/validate-license` returns `valid: false` | `export` → `export` | `licenseValid = false` |
 | `RESET` | "Start over" or "Repair another file" | any → `broken` | All fields reset to `initialState` |
 
 **Race condition guard:** `repairRunIdRef` is incremented on each new repair start and on reset. Async callbacks (FFmpeg result, progress timer) check their captured `repairRunId` against `repairRunIdRef.current` before dispatching — stale results from a cancelled repair are silently discarded.
@@ -330,27 +334,18 @@ output.exists() && output.metadata().map(|m| m.len()).unwrap_or(0) > 1024
 
 | Property | Value |
 |---|---|
-| Provider | Lemon Squeezy |
-| Endpoint | `POST https://api.lemonsqueezy.com/v1/licenses/validate` |
-| Auth header | `Authorization: Bearer {LEMON_SQUEEZY_API_KEY}` |
-| Accept header | `Accept: application/json` |
-| Content-Type | `Content-Type: application/json` |
-| Request body | `{ "license_key": "<key>", "instance_name": "StreamSalvage-Desktop" }` |
+| Provider | Own API on the landing site (Stripe for payment, Upstash Redis for keys, Brevo for email) |
+| Endpoint | `POST https://streamsalvage.com/api/validate-license` (build-time override: `STREAMSALVAGE_LICENSE_API_URL`) |
+| Auth | None. No secrets in the app |
+| Headers | `Accept: application/json`, `Content-Type: application/json` |
+| Request body | `{ "licenseKey": "<key>" }` |
+| Key format | `SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX` (generated by `landing/pages/api/webhook.js`) |
 | Response field | `json["valid"]` as bool (defaults to `false` on missing/null) |
-| Non-2xx handling | Returns `Ok(false)` — not treated as a hard error |
-| Network error | Returns `Err(String)` — JS catches and returns `false`, displays "Could not verify license - check your internet connection" |
+| Non-2xx handling | Returns `Ok(false)`, not treated as a hard error |
+| Network error | Returns `Err(String)`; the UI shows "Could not verify license - check your internet connection" |
+| Persistence | Valid key saved to `%APPDATA%\StreamSalvage\license.json` and re-validated on each launch |
 
-**API key embedding (build.rs):**
-```rust
-if let Ok(key) = std::env::var("LEMON_SQUEEZY_API_KEY") {
-    println!("cargo:rustc-env=LEMON_SQUEEZY_API_KEY={}", key);
-}
-```
-The key is read from the build environment at compile time and embedded into the binary. At runtime, `std::env::var("LEMON_SQUEEZY_API_KEY")` reads the embedded value.
-
-⚠️ ASSUMPTION: The `cargo:rustc-env` output from `build.rs` causes Cargo to set the env var at compile time, making it readable at runtime via `env!()` or `std::env::var()`. In practice, `std::env::var()` at runtime reads the *process* environment, not the compile-time value. The `build.rs` line as written is only effective if the application is compiled with the env var set — which works correctly in CI/CD but the runtime `std::env::var()` call reads the ambient process environment, not the embedded value. This means the binary does **not** have the key baked in; the key must be present in the runtime environment or set via another mechanism. This warrants investigation before production release.
-
-**Dev mode bypass:** When `LEMON_SQUEEZY_API_KEY` is absent from the environment, any key starting with `"TEST-"` returns `Ok(true)`. The ExportPanel renders a hint message in `import.meta.env.DEV` builds only.
+**Dev mode bypass:** Debug builds compiled without `STREAMSALVAGE_LICENSE_API_URL` accept any key starting with `"TEST-"`. Release builds always call the API. The ExportPanel shows a hint only in `import.meta.env.DEV` builds.
 
 ---
 
@@ -358,9 +353,9 @@ The key is read from the build environment at compile time and embedded into the
 
 | Area | Implementation |
 |---|---|
-| API key storage | Passed via build-time env var; see ⚠️ note in §6 |
-| User data | No user data, file paths, or keys persisted to disk |
-| Network | Only outbound call is license validation POST; no inbound ports |
+| Secrets | None in the app binary. Stripe, Redis and Brevo keys exist only as Vercel env vars for the landing API |
+| User data | Only the license key is persisted (`%APPDATA%\StreamSalvage\license.json`); no file paths or video data |
+| Network | Only outbound call is the license validation POST to streamsalvage.com; no inbound ports |
 | File operations | FFmpeg reads input files; writes only `_recovered.mp4` adjacent to input; `save_repaired_file` writes to user-chosen path |
 | CSP | `"csp": null` in `tauri.conf.json` — Content Security Policy disabled |
 | Capabilities | Minimal: dialog, shell-execute, shell-open, opener, path-resolve |

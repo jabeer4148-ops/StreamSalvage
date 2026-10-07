@@ -21,7 +21,7 @@ StreamSalvage is a Tauri 2 desktop app — Rust process manages FFmpeg, React UI
 │                                             │
 │  repair_no_reference                        │
 │  repair_with_reference                      │
-│  validate_license  (Lemon Squeezy API)      │
+│  validate_license  (streamsalvage.com API)  │
 │  open_file_in_player                        │
 │  save_repaired_file                         │
 │                                             │

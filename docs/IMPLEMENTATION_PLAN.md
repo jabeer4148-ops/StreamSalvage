@@ -9,7 +9,7 @@
 |---|---|
 | `repair_no_reference` | ✅ Complete — validates input, resolves FFmpeg, runs stream copy, validates output |
 | `repair_with_reference` | ✅ Complete — 3-strategy escalating repair (stream copy → reference remap → fallback +genpts) |
-| `validate_license` | ✅ Complete — Lemon Squeezy API + dev bypass; async + error handling |
+| `validate_license` | ✅ Complete — POST to streamsalvage.com/api/validate-license + debug-only TEST- bypass |
 | `open_file_in_player` | ✅ Complete — Windows-only `cmd /c start ""` |
 | `save_repaired_file` | ✅ Complete — `std::fs::copy` with error propagation |
 
@@ -41,7 +41,7 @@
 |---|---|
 | `src-tauri/tauri.conf.json` | ✅ Complete — window, bundle, icons, external binary |
 | `src-tauri/capabilities/default.json` | ✅ Complete — all required permissions |
-| `src-tauri/build.rs` | ✅ Complete — reads `LEMON_SQUEEZY_API_KEY` and passes to build |
+| `src-tauri/build.rs` | ✅ Complete — passes optional `STREAMSALVAGE_LICENSE_API_URL` override into the build |
 | `src-tauri/Cargo.toml` | ✅ Complete (with 2 unused deps — see §2) |
 | `package.json` | ✅ Complete |
 | `.env.example` | ✅ Complete |
@@ -66,11 +66,8 @@ Findings from searching the codebase for placeholders, dev artifacts, and hardco
 - `src-tauri/tauri.conf.json` — `"productName": "StreamSalvage"`
 - **Action:** Decide on one brand name. Either update the landing page to "StreamSalvage" or the Tauri config to "RecoverRec" everywhere. Currently the app calls itself "StreamSalvage" but the landing page, support email, and footer say "RecoverRec".
 
-**2. `LEMON_SQUEEZY_API_KEY` runtime vs. compile-time embedding bug**
-- `src-tauri/build.rs:3` — `println!("cargo:rustc-env=LEMON_SQUEEZY_API_KEY={}", key);`
-- `src-tauri/src/main.rs:356` — `std::env::var("LEMON_SQUEEZY_API_KEY").unwrap_or_else(|_| "".to_string())`
-- `cargo:rustc-env` makes the var available at compile time via `env!()`, **not** at runtime via `std::env::var()`. The shipped binary will always read empty string from the process environment unless the var is in the runtime environment.
-- **Action:** Change `main.rs:356` to use `env!("LEMON_SQUEEZY_API_KEY", "")` (compile-time) OR document that the key must be in the runtime process environment (e.g., via an `.env` file loaded at startup or CI injection). The current setup works in dev if you set the var in your shell, but the shipped binary won't have it baked in.
+**2. ~~`LEMON_SQUEEZY_API_KEY` embedding bug~~ (superseded)**
+- Lemon Squeezy was dropped. Payments now run through Stripe on the landing site, and the app validates keys against `https://streamsalvage.com/api/validate-license`. No API key is compiled into the app.
 
 **3. Unused Cargo dependencies**
 - `Cargo.toml:22` — `tauri-plugin-opener = "2"` — in Cargo.toml but not registered in `main.rs`
@@ -90,14 +87,11 @@ Findings from searching the codebase for placeholders, dev artifacts, and hardco
   ```
 - **Status:** This is correctly gated on `import.meta.env.DEV` — it will NOT appear in production builds. No action required, but verify in the production bundle.
 
-**5. `TEST-` prefix bypass in production binary**
-- `src-tauri/src/main.rs:359` — `return Ok(license_key.starts_with("TEST-"));`
-- This bypass is ONLY active when `LEMON_SQUEEZY_API_KEY` is empty at runtime.
-- **Action:** Confirm that the production binary is built with a valid `LEMON_SQUEEZY_API_KEY` set. If the API key is properly embedded/injected, the bypass is unreachable in production. If the key embedding bug (item 2 above) isn't fixed, TEST- keys will work in production.
+**5. `TEST-` prefix bypass**
+- `src-tauri/src/main.rs` — active only when `cfg!(debug_assertions)` is true and no `STREAMSALVAGE_LICENSE_API_URL` was set at build time. Release builds always call the API. No action needed.
 
-**6. Hardcoded checkout URL**
-- `src/components/ExportPanel.tsx:97` — `href="https://streamsalvage.lemonsqueezy.com/buy/"`
-- **Action:** Verify this URL is live and the Lemon Squeezy product is in live mode. The URL is hardcoded and must match the real product URL.
+**6. Buy link in the app**
+- `src/components/ExportPanel.tsx` — `href="https://streamsalvage.com/#download"` (site Buy button → Stripe Checkout). Pointing at the site means price changes don't need an app release.
 
 **7. GitHub release URL on landing page**
 - `landing/index.html:340,461` — `https://github.com/jabeer4148-ops/StreamSalvage/releases`
@@ -118,14 +112,13 @@ Findings from searching the codebase for placeholders, dev artifacts, and hardco
 
 ### Code
 - [ ] Resolve brand name: choose "StreamSalvage" or "RecoverRec" and update consistently
-- [ ] Fix `LEMON_SQUEEZY_API_KEY` embedding: use `env!()` macro OR runtime env var loading
 - [ ] Remove unused Cargo deps: `tauri-plugin-opener`, `uuid`
-- [ ] Verify `https://streamsalvage.lemonsqueezy.com/buy/` is the live product URL
+- [ ] Verify the site Buy button opens Stripe Checkout in live mode
 - [ ] Set up `support@recoverrec.com` email account
 - [ ] Verify `.env` is in `.gitignore` (✅ it is — `.local` glob covers `.env.local`; verify `.env` itself is covered)
 
 ### Build
-- [ ] Run `npm run tauri build` — clean release build with `LEMON_SQUEEZY_API_KEY` set in environment
+- [ ] Run `npm run tauri build` — clean release build (no payment secrets needed; set `STREAMSALVAGE_LICENSE_API_URL` only to point at a different API)
 - [ ] Verify installer artifacts at `src-tauri/target/release/bundle/`
 - [ ] Check installer size is acceptable (FFmpeg dominates — likely 60–120 MB)
 - [ ] Verify `import.meta.env.DEV` hint is absent in production bundle (inspect built JS)
@@ -139,17 +132,14 @@ Findings from searching the codebase for placeholders, dev artifacts, and hardco
 - [ ] Submit installer to VirusTotal — screenshot clean result for Reddit posts
 - [ ] Submit to Microsoft Security Intelligence (WDSI) for reputation seeding: https://www.microsoft.com/en-us/wdsi/filesubmission
 
-### Lemon Squeezy
-- [ ] Live mode approved in Lemon Squeezy dashboard
-- [ ] Product published in live mode
-- [ ] Confirm real product ID matches the one used in API responses
-- [ ] `LEMON_SQUEEZY_API_KEY` set in CI/CD secrets (or build environment)
-- [ ] `LEMON_SQUEEZY_API_KEY` loaded correctly in production binary (verify with a real key)
-- [ ] Checkout URL verified: `https://streamsalvage.lemonsqueezy.com/buy/` loads product page
-- [ ] Test purchase end-to-end with a real card in Lemon Squeezy live mode
-- [ ] Confirm license key email received from Lemon Squeezy
-- [ ] Confirm received key validates successfully in the production app build
-- [ ] Confirm refund policy configured in Lemon Squeezy (FAQ promises "full refund — no questions asked")
+### Stripe + license delivery
+- [ ] Stripe in live mode; `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` ($29 one-time price) set in Vercel
+- [ ] Stripe webhook registered for `checkout.session.completed` at the exact final URL (`https://www.streamsalvage.com/api/webhook`; Stripe treats redirects as failures); `STRIPE_WEBHOOK_SECRET` set
+- [ ] `KV_REST_API_URL` / `KV_REST_API_TOKEN` (Upstash Redis) set
+- [ ] `BREVO_API_KEY` set; support@streamsalvage.com verified as a Brevo sender
+- [ ] Test purchase end-to-end with a real card
+- [ ] Confirm the license email arrives and the key validates in the production app build
+- [ ] Refunds are issued in the Stripe dashboard (FAQ promises "full refund — no questions asked"). Refunded keys stay valid unless deleted from Redis
 
 ### Distribution
 - [ ] Create GitHub Release v1.0.0 on `jabeer4148-ops/StreamSalvage`
@@ -220,7 +210,7 @@ Derived from the codebase's current platform constraints and Tauri's capabilitie
 ---
 
 ### ADR-003: One-time $29 purchase over subscription
-**Decision:** Single payment of $29 via Lemon Squeezy, gated at export.
+**Decision:** Single payment of $29 via Stripe Checkout, gated at export.
 **Reason:** StreamSalvage is a panic-buy tool — users pay once after a crisis. Subscription model creates friction and churn tracking complexity inappropriate for this use case. One-time price matches user mental model of a utility.
 **Trade-off:** No recurring revenue; pricing cannot be changed without affecting existing customers' expectations; no leverage for future feature upgrades.
 

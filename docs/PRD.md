@@ -11,7 +11,7 @@ StreamSalvage (marketed as "RecoverRec" on the landing page) is a Windows deskto
 
 **Target user persona** (derived from landing page copy and UI language): Streamers and content creators on Windows who record with OBS, have experienced at least one crash-corrupted recording, are not comfortable with command-line tools, and are willing to pay a small one-time fee to recover footage that represents hours of work. The landing page explicitly targets users who have already tried VLC and rejected cloud tools as "sketchy."
 
-**Business model** (derived from `ExportPanel.tsx` and Lemon Squeezy checkout URL): One-time purchase of $29 via Lemon Squeezy. The checkout URL is `https://streamsalvage.lemonsqueezy.com/buy/`. After purchase, users receive a license key by email and enter it in the app to unlock file export. The repair and preview features are free; only the export (save to disk) is gated.
+**Business model:** One-time purchase of $29 via Stripe Checkout on streamsalvage.com (site Buy button → `/api/create-checkout`). After payment, the Stripe webhook generates a license key (`SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX`) and emails it via Brevo; users enter it in the app to unlock file export. The repair and preview features are free; only the export (save to disk) is gated.
 
 ---
 
@@ -115,16 +115,16 @@ A GUI wrapper around proven FFmpeg recovery strategies, delivered as a signed Wi
 
 | ID | Requirement |
 |---|---|
-| FR-026 | App shall require a valid Lemon Squeezy license key before enabling file export. |
+| FR-026 | App shall require a valid StreamSalvage license key (issued after Stripe payment) before enabling file export. |
 | FR-027 | App shall auto-uppercase characters as the user types in the license key input field. |
 | FR-028 | App shall allow license validation to be triggered by pressing Enter in the license key field. |
-| FR-029 | App shall validate the license key against the Lemon Squeezy API endpoint `POST https://api.lemonsqueezy.com/v1/licenses/validate`. |
-| FR-030 | App shall display the error: "License key not recognized. Check your purchase email from Lemon Squeezy. Keys look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" on invalid key. |
+| FR-029 | App shall validate the license key with `POST https://streamsalvage.com/api/validate-license` and body `{ "licenseKey": "<key>" }` (endpoint overridable at build time via `STREAMSALVAGE_LICENSE_API_URL`). |
+| FR-030 | App shall display the error: "License key not recognized. Check your StreamSalvage purchase email. Keys look like: SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" on invalid key. |
 | FR-031 | App shall display a "Save repaired video to disk" button after successful license validation. |
 | FR-032 | App shall open a native save dialog with default filename `repaired_recording.mp4` filtered to `.mp4` only. |
 | FR-033 | App shall copy the repaired file to the user-chosen destination using `std::fs::copy`. |
 | FR-034 | App shall display "File saved successfully" and a "Repair another file" link after successful export. |
-| FR-035 | App shall display a checkout link to `https://streamsalvage.lemonsqueezy.com/buy/` for users who don't have a license. |
+| FR-035 | App shall display a checkout link to `https://streamsalvage.com/#download` for users who don't have a license. |
 
 **Navigation**
 
@@ -140,7 +140,7 @@ A GUI wrapper around proven FFmpeg recovery strategies, delivered as a signed Wi
 | ID | Requirement |
 |---|---|
 | FR-040 | In development builds (`import.meta.env.DEV`), app shall display a hint: "Dev mode: use TEST-XXXX to bypass validation." |
-| FR-041 | When `LEMON_SQUEEZY_API_KEY` env var is empty at runtime, any license key beginning with `TEST-` shall validate as true. |
+| FR-041 | In debug builds compiled without `STREAMSALVAGE_LICENSE_API_URL`, any license key beginning with `TEST-` shall validate as true. Release builds never use this bypass. |
 
 ---
 

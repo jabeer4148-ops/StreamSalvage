@@ -295,8 +295,9 @@ Key visual details:
 │ └──────────────────────────────────────┘ │
 │                                          │
 │ License key                              │
-│ [XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX ] │  ← monospace input
-│ Key is verified locally - never stored   │
+│ [SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX] │  ← monospace input
+│ Checked once with streamsalvage.com,     │
+│ then remembered on this PC               │
 │                                          │
 │ [Verify license key]                     │  ← teal CTA
 └──────────────────────────────────────────┘
@@ -316,8 +317,8 @@ Key visual details:
 | Progress goes 0–90% then snaps to 100% | FFmpeg has no progress callback. Simulating 0–90% gives visual feedback. The snap to 100% on completion is honest — it doesn't pretend to know FFmpeg's internal completion percentage. |
 | Log terminal shown during repair | Trust signal: users can see FFmpeg's actual output and know the app isn't frozen. Informed users are less likely to force-close during a long repair. |
 | REPAIR_FAILED returns to REFERENCE (not BROKEN) | The user already selected their broken file. Returning to REFERENCE preserves `brokenFilePath` in state and lets the user try again with a reference file without re-selecting the broken file. |
-| License input auto-uppercases | Lemon Squeezy license keys are uppercase. Auto-uppercasing prevents copy-paste case errors. |
-| "Key is verified locally - never stored on our servers" | Trust signal. The key is sent to Lemon Squeezy for validation, but the app itself does not persist it to disk. |
+| License input auto-uppercases | StreamSalvage keys (`SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX`) are uppercase, and the server also normalizes to uppercase. Auto-uppercasing prevents copy-paste case errors. |
+| "Checked once with streamsalvage.com, then remembered on this PC" | Key is validated against streamsalvage.com/api/validate-license (Upstash Redis), then saved by the app to `%APPDATA%\StreamSalvage\license.json` for future launches. |
 | BROKEN step button is disabled once file is selected | The button's job is file selection; once done, it becomes a status indicator ("File selected - continuing") that auto-advances. No manual confirm step needed. |
 | repairRunIdRef race condition guard | Prevents a scenario where a user hits "Start over" during repair, then the FFmpeg result comes back and overwrites the fresh BROKEN state. |
 
@@ -354,7 +355,7 @@ Key visual details:
 - FFmpeg missing: "FFmpeg binary not found. Tried multiple locations. Please ensure src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe exists and Git LFS files are pulled (run: git lfs pull)"
 - Stream copy failed: "FFmpeg stream copy could not recover this file."
 - Fully corrupted: "Could not reconstruct file. The recording may be too severely corrupted."
-- Bad license: "License key not recognized. Check your purchase email from Lemon Squeezy. Keys look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+- Bad license: "License key not recognized. Check your StreamSalvage purchase email. Keys look like: SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
 - Network error: "Could not verify license - check your internet connection and try again."
 - Export failed: "Export failed - the save dialog may have been cancelled, or the destination folder may not be writable. Try again."
 - Preview path missing: "Repair completed but output file path is missing. Please restart and try again."
@@ -383,7 +384,7 @@ Key visual details:
 - "MP4 crash recovery - local - no upload" (app subtitle)
 - "Free preview — first 30 seconds"
 - "No subscription · instant license key via email"
-- "Key is verified locally - never stored on our servers"
+- "Checked once with streamsalvage.com, then remembered on this PC"
 - "Save to any folder - keeps original untouched"
 - Landing: "your files never leave your PC"
 - Landing: "No command line. No upload. No sketchy software."

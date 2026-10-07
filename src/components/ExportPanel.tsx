@@ -47,7 +47,7 @@ export function ExportPanel({
       } else {
         setError(
           'License key not recognized. Check your StreamSalvage purchase email. ' +
-            'Keys look like: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+            'Keys look like: SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX',
         );
       }
     } catch {
@@ -136,7 +136,7 @@ export function ExportPanel({
           value={key}
           onChange={(e) => setKey(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === 'Enter' && handleCheckLicense()}
-          placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+          placeholder="SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
           className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm font-mono text-neutral-800 mb-1 focus:outline-none focus:ring-2 focus:ring-[#1D9E75] focus:border-transparent tracking-wider"
           spellCheck={false}
           autoComplete="off"
@@ -151,7 +151,7 @@ export function ExportPanel({
 
         {!error && (
           <p className="text-xs text-neutral-400 mb-3">
-            Key is verified locally - never stored on our servers
+            Checked once with streamsalvage.com, then remembered on this PC
           </p>
         )}
 

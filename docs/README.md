@@ -40,4 +40,4 @@ The following assumptions were made where code alone was insufficient:
 
 **Repair success rates:** ~40% without reference file · ~85% with reference file
 
-**Price:** $29 one-time via [Lemon Squeezy](https://streamsalvage.lemonsqueezy.com/buy/)
+**Price:** $29 one-time via Stripe Checkout on [streamsalvage.com](https://www.streamsalvage.com/#download)
