@@ -32,7 +32,7 @@
       "url": "https://www.streamsalvage.com"
     },
     "datePublished": "2026-06-13",
-    "dateModified": "2026-06-13",
+    "dateModified": "2026-09-26",
     "mainEntityOfPage": "https://www.streamsalvage.com/guides/fix-corrupted-obs-recording"
   }
   </script>
@@ -65,7 +65,7 @@
       {
         "@type": "Question",
         "name": "Do I need the original OBS settings to repair the file?",
-        "acceptedAnswer": { "@type": "Answer", "text": "For the highest success rate, yes. A reference clip recorded with the same resolution, frame rate, and encoder as the broken recording gives the repair a matching template to rebuild from, pushing success rates to around 85%." }
+        "acceptedAnswer": { "@type": "Answer", "text": "A matching reference is useful when the recording is missing metadata. Match the resolution, frame rate, video encoder, and audio settings as closely as possible. A reference cannot restore frames that were never saved, and a successful repair is not guaranteed." }
       },
       {
         "@type": "Question",
@@ -152,12 +152,27 @@
 
       <p class="eyebrow">OBS recovery guide</p>
       <h1>How to fix a corrupted OBS recording when the MP4 won't play</h1>
-      <p class="meta">Last updated June 13, 2026 · ~6 min read</p>
+      <p class="meta">Last updated September 26, 2026 · ~6 min read</p>
 
       <p class="lead">You finished a long stream, OBS crashed or you ran out of disk space, and now you're staring at an MP4 that refuses to open in any player. The good news: in most OBS-crash cases the video and audio are still inside the file — only the part that tells a player how to read them is missing. This guide explains exactly why that happens and walks through how to repair it on Windows.</p>
 
+      <h2>Check the file before choosing a repair</h2>
+      <ul>
+        <li><strong>0 bytes:</strong> there is no video data in that file to rebuild. Look for another recording, backup, or recovered copy first.</li>
+        <li><strong>MKV or a readable fragmented MP4:</strong> try OBS File → Remux Recordings on a copy. You may not need a repair tool.</li>
+        <li><strong>Plays in VLC but not another app:</strong> check player and codec compatibility before treating the recording as corrupt.</li>
+        <li><strong>Non-empty standard MP4 with a missing moov atom:</strong> preserve the original and try the matching-reference approach below.</li>
+      </ul>
+
+      <h2>How to recover an unfinished OBS recording in MP4</h2>
+      <p>For an unfinished standard MP4, first preserve the non-empty original. If OBS or FFmpeg cannot read its metadata, repeating a remux will not finish the recording. Try a matching reference clip, then check the recovered duration and each audio track. The steps below explain that workflow.</p>
+
+      <h2>“Recording remuxed, but the file may be incomplete”</h2>
+      <p>This OBS warning means you should verify the output before relying on it. Keep the source recording, check free space in the destination, and compare the source and output duration, picture, and audio tracks. If the original MKV plays, preserve it and investigate output-format or codec compatibility before attempting MP4 reconstruction.</p>
+      <p>The warning appears in <a href="https://github.com/obsproject/obs-studio/blob/master/frontend/data/locale/en-US.ini">OBS's remux messages</a>. It does not by itself identify missing MP4 metadata. Our <a href="/guides/ffmpeg-invalid-data-found">FFmpeg input-error guide</a> explains how to check which streams remain readable.</p>
+
       <h2>Why an OBS recording becomes corrupted</h2>
-      <p>An MP4 file stores a small but critical index called the <strong>moov atom</strong>. It records the timescale, duration, and the location of every frame — essentially the table of contents a media player reads first. By design, OBS can only write the moov atom <em>after</em> recording finishes and the file is finalized.</p>
+      <p>An MP4 file stores a small but critical index called the <strong>moov atom</strong>. It records the timescale, duration, and the location of every frame — essentially the table of contents a media player reads first. With standard MP4 recording, OBS writes the final index when recording stops. Hybrid MP4 and fragmented MP4 use a different structure that is more resilient to interruptions.</p>
       <p>If OBS crashes, your PC loses power, or the disk fills up before that final step, the recording is never finalized. The raw frames are written to disk, but the moov atom never gets created. The result is a file that is mostly complete yet completely unplayable, often producing a <code>moov atom not found</code> error.</p>
       <div class="callout">
         <p><strong>The key insight:</strong> a missing moov atom is not the same as lost footage. The frames are usually right there on disk — the file just has no index pointing to them. That's why these recordings are so often recoverable.</p>
@@ -170,11 +185,11 @@
       <p>Before anything else, make a copy of the broken recording and work only on the copy. Repair attempts should never overwrite your one surviving file. Note the exact OBS settings you recorded with if you can remember them — resolution, frame rate, and encoder (x264, NVENC, etc.). You'll want these in a moment.</p>
 
       <h2>Step 2: Try a straight stream-copy repair first</h2>
-      <p>Some interrupted files can be salvaged with a simple FFmpeg stream copy, which attempts to re-wrap whatever readable data exists into a fresh container. On its own this works roughly 40% of the time — usually on files where only the very end was cut off. It's worth trying first because it's fast and requires nothing else.</p>
-      <p>StreamSalvage runs this step automatically when you drop a file in, and tells you whether it succeeded before you do anything more involved.</p>
+      <p>If FFmpeg can read the file and identify its streams, a stream copy can remux the readable media into a new container without re-encoding. It cannot rebuild a completely missing moov atom. If it reports that error, move on to reference-assisted repair.</p>
+      <p>In StreamSalvage, select the broken file and choose whether to provide a reference before starting the repair. You can inspect the preview if a repair succeeds.</p>
 
-      <h2>Step 3: Use a reference clip (the method that actually works)</h2>
-      <p>This is the technique that takes success rates from ~40% to around <strong>85%</strong>, and it's the part most people miss. The idea: record a short, clean clip using the <em>same OBS settings</em> as your broken recording. Because it finalizes correctly, that clip contains a healthy moov atom built by the exact same encoder. That healthy structure becomes a template the repair uses to rebuild the missing index in your broken file.</p>
+      <h2>Step 3: Try repair with a matching reference clip</h2>
+      <p>A reference clip can help a repair tool interpret surviving media when the original index is missing. Recovery depends on the file damage and codec support. To try it, record a short, clean clip using the <em>same OBS settings</em> as your broken recording. Because it finalizes correctly, that clip contains a healthy moov atom built by the exact same encoder. That healthy structure becomes a template the repair uses to rebuild the missing index in your broken file.</p>
       <ol>
         <li>Open OBS and load the same scene/encoder settings you used originally.</li>
         <li>Record about 10 seconds, then stop so the clip finalizes normally.</li>
@@ -192,7 +207,7 @@
         <thead><tr><th scope="col">Manual (untrunc CLI)</th><th scope="col">StreamSalvage</th></tr></thead>
         <tbody>
           <tr><td>Build and run from terminal</td><td>Drag and drop</td></tr>
-          <tr><td>Guess whether it worked</td><td>Free preview before you pay</td></tr>
+          <tr><td>Open the output in a player to check it</td><td>Free preview before you pay</td></tr>
           <tr><td>Local, but technical</td><td>100% local, no command line</td></tr>
           <tr><td>Free</td><td>$29 one-time to export</td></tr>
         </tbody>
@@ -205,12 +220,8 @@
       </div>
 
       <h2>How to prevent this next time</h2>
-      <p>Once your file is recovered, change two OBS settings so a crash can't ruin a recording again:</p>
-      <ul>
-        <li><strong>Record to MKV, then remux to MP4.</strong> MKV stays playable even if OBS crashes mid-recording, because it doesn't depend on a final index. OBS can remux it to MP4 afterward with no quality loss.</li>
-        <li><strong>Or enable fragmented MP4</strong> in OBS output settings, which writes the index incrementally so a crash leaves a still-readable file.</li>
-      </ul>
-      <p>Either option means the worst-case outcome is a recording you can still open — no repair needed.</p>
+      <p>Reduce the risk of another interrupted recording by choosing MKV and remuxing to MP4 afterward, or using Hybrid MP4 if your OBS version offers it. Keep adequate free disk space and test playback in your editor.</p>
+      <p>See our <a href="/guides/obs-record-mkv-vs-mp4">OBS MKV, MP4, and Hybrid MP4 comparison</a> and <a href="https://obsproject.com/kb/hybrid-mp4">OBS's explanation of Hybrid MP4</a>. These formats improve resilience; they cannot protect against every drive failure or recover data that was never written.</p>
 
       <h2>Frequently asked questions</h2>
       <div class="faq-list">
@@ -224,7 +235,7 @@
         </details>
         <details>
           <summary>Do I need the original OBS settings to repair the file?</summary>
-          <p>For the highest success rate, yes. A reference clip recorded with the same resolution, frame rate, and encoder as the broken recording gives the repair a matching template to rebuild from, pushing success rates to around 85%.</p>
+          <p>A matching reference is useful when the recording is missing metadata. Match the resolution, frame rate, video encoder, and audio settings as closely as possible. A reference cannot restore frames that were never saved, and a successful repair is not guaranteed.</p>
         </details>
         <details>
           <summary>Will repairing the file upload my video anywhere?</summary>

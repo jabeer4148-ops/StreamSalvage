@@ -6,31 +6,38 @@
 
   <script src="https://analytics.ahrefs.com/analytics.js" data-key="DFAntYNQMgR65gpB6PNLVg" async></script>
 
-  <title>FFmpeg "Invalid Data Found When Processing Input": What It Means</title>
-  <meta name="description" content="FFmpeg throws 'invalid data found when processing input' on unfinalized MP4s. What the error means, the flags worth trying, and what to do when FFmpeg can't help." />
+  <title>FFmpeg Invalid Data Found When Processing Input: Fixes</title>
+  <meta name="description" content="Diagnose FFmpeg or ffprobe invalid data errors. Check the input file, probe readable streams, try remuxing, and know when missing MP4 metadata needs repair." />
   <link rel="canonical" href="https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found" />
 
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found" />
-  <meta property="og:title" content="FFmpeg &quot;Invalid Data Found When Processing Input&quot;: What It Means" />
-  <meta property="og:description" content="The flags worth trying on a broken MP4 — and what to do when FFmpeg can't help." />
+  <meta property="og:title" content="FFmpeg Invalid Data Found When Processing Input: Fixes" />
+  <meta property="og:description" content="Diagnose FFmpeg or ffprobe invalid data errors. Check the input file, probe readable streams, try remuxing, and know when missing MP4 metadata needs repair." />
   <meta property="og:site_name" content="StreamSalvage" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="FFmpeg &quot;Invalid Data Found When Processing Input&quot;: What It Means" />
-  <meta name="twitter:description" content="The flags worth trying on a broken MP4 — and what to do when FFmpeg can't help." />
+  <meta name="twitter:title" content="FFmpeg Invalid Data Found When Processing Input: Fixes" />
+  <meta name="twitter:description" content="Diagnose FFmpeg or ffprobe invalid data errors. Check the input file, probe readable streams, try remuxing, and know when missing MP4 metadata needs repair." />
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": "FFmpeg \"Invalid Data Found When Processing Input\": What It Means",
-    "description": "Why FFmpeg rejects unfinalized MP4 files, which recovery flags are worth trying, and when to switch to reference-file repair.",
-    "author": { "@type": "Person", "name": "Abdul Jabeer Shaik" },
-    "publisher": { "@type": "Organization", "name": "StreamSalvage", "url": "https://www.streamsalvage.com" },
-    "datePublished": "2026-07-08",
-    "dateModified": "2026-07-08",
-    "mainEntityOfPage": "https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found"
-  }
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "FFmpeg Invalid Data Found When Processing Input: Fixes",
+  "description": "Diagnose FFmpeg or ffprobe invalid data errors. Check the input file, probe readable streams, try remuxing, and know when missing MP4 metadata needs repair.",
+  "author": {
+    "@type": "Person",
+    "name": "Abdul Jabeer Shaik"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "StreamSalvage",
+    "url": "https://www.streamsalvage.com"
+  },
+  "datePublished": "2026-07-08",
+  "dateModified": "2026-09-26",
+  "mainEntityOfPage": "https://www.streamsalvage.com/guides/ffmpeg-invalid-data-found"
+}
   </script>
   <script type="application/ld+json">
   {
@@ -44,32 +51,44 @@
   }
   </script>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "What does FFmpeg's 'invalid data found when processing input' mean?",
-        "acceptedAnswer": { "@type": "Answer", "text": "FFmpeg's demuxer couldn't parse the file: the structure it expected (a valid MP4 header and index) isn't there. On recordings that were interrupted, it almost always means the moov atom was never written, so FFmpeg has no map of the streams." }
-      },
-      {
-        "@type": "Question",
-        "name": "Can FFmpeg repair an MP4 with a missing moov atom?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No. FFmpeg needs a parseable input; it can't reconstruct a missing index. Flags like -err_detect ignore_err help only when the file is partially readable. For a truly unfinalized MP4 you need a reference-based tool that rebuilds the index from a healthy clip." }
-      },
-      {
-        "@type": "Question",
-        "name": "Which FFmpeg flags are worth trying on a broken MP4?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Try a plain stream copy first (ffmpeg -i broken.mp4 -c copy out.mp4), then -err_detect ignore_err, and ffprobe to see what's readable. If every command returns 'invalid data found when processing input', stop — the container needs rebuilding, not decoding." }
-      },
-      {
-        "@type": "Question",
-        "name": "What should I use when FFmpeg can't read the file at all?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A reference-file repair tool. It takes a short healthy clip recorded with the same settings and uses its structure to rebuild the broken file's index. untrunc does this on the command line; StreamSalvage does it with a drag-and-drop GUI, free preview, and no upload." }
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does FFmpeg's invalid data found when processing input mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FFmpeg could not parse the supplied input as expected. Possible causes include an incomplete file, damaged metadata, the wrong input file, or an unexpected server response. Read the preceding error lines to narrow down the cause."
       }
-    ]
-  }
+    },
+    {
+      "@type": "Question",
+      "name": "Can FFmpeg repair an MP4 with a missing moov atom?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A normal FFmpeg remux requires readable input metadata. Stream copy and faststart cannot rebuild a completely missing moov atom. For an interrupted recording with surviving media, a compatible reference-based repair tool may help."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I do if ffprobe reports invalid data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Verify the file path, size, and transfer first, then examine the full error output. If ffprobe lists streams, try a remux on a copy. If it explicitly reports missing MP4 metadata after a recording interruption, consider repair with a matching reference."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does err_detect ignore_err fix a corrupt MP4?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It can affect how some decoding errors are handled, but it is not a missing-index repair. Stream copying bypasses decoding, and the option cannot create absent media or container metadata."
+      }
+    }
+  ]
+}
   </script>
 
   <style>
@@ -104,6 +123,7 @@
     .callout { border: 1px solid var(--neutral-200); border-left: 3px solid var(--primary); border-radius: 8px; background: var(--white); padding: 16px 18px; margin: 22px 0; }
     .callout.warn { border-left-color: var(--danger); }
     .callout p:last-child { margin-bottom: 0; }
+    pre { max-width: 100%; overflow-x: auto; padding: 14px; background: var(--neutral-100); border-radius: 8px; }
     code { background: var(--neutral-100); border-radius: 4px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; color: var(--neutral-900); }
     .cta-box { background: var(--white); border: 1px solid var(--neutral-200); border-radius: 12px; padding: 24px; margin: 36px 0; text-align: center; }
     .cta-box h3 { margin-top: 0; }
@@ -146,62 +166,37 @@
         <a href="/">Home</a> › <a href="/guides">Guides</a> › <span>FFmpeg invalid data found</span>
       </nav>
 
-      <p class="eyebrow">Error explained</p>
-      <h1>FFmpeg "invalid data found when processing input": what it actually means</h1>
-      <p class="meta">Last updated July 8, 2026 · ~6 min read</p>
-
-      <p class="lead">You pointed FFmpeg at a broken recording and got <code>Invalid data found when processing input</code>. You're already on the command line, so here's the short version: FFmpeg's demuxer can't parse the file, and if the recording was interrupted (OBS crash, Streamlabs BSOD, camera power loss), no decoding flag will change that. Here's what's worth trying — and when to stop.</p>
-
-      <h2>Why FFmpeg rejects the file</h2>
-      <p>FFmpeg reads an MP4 by first locating the <a href="/guides/moov-atom-not-found">moov atom</a> — the index describing every sample in the file. An interrupted recording never got its index written. FFmpeg finds <code>mdat</code> (the raw data) but no map, gives up, and prints <code>invalid data found when processing input</code>. The error is accurate from the demuxer's perspective and misleading from yours: the data is there, it's the structure that's missing.</p>
-
-      <h2>The commands worth trying (in order)</h2>
-      <ol>
-        <li><strong>Probe what's readable:</strong>
-          <p><code>ffprobe -v error -show_format -show_streams broken.mp4</code></p>
-          <p>If ffprobe sees streams, you have a partial index and a real chance with FFmpeg alone.</p></li>
-        <li><strong>Plain stream copy:</strong>
-          <p><code>ffmpeg -i broken.mp4 -c copy -avoid_negative_ts make_zero fixed.mp4</code></p>
-          <p>Works when only the tail of the file is damaged. Fast, lossless, always try it first.</p></li>
-        <li><strong>Tolerant read:</strong>
-          <p><code>ffmpeg -err_detect ignore_err -i broken.mp4 -c copy fixed.mp4</code></p>
-          <p>Ignores recoverable bitstream errors. Salvages files damaged mid-stream — one OBS user recovered footage up to the exact frame of an NVENC encoder crash this way.</p></li>
-        <li><strong>Faststart, for files that play but seek badly:</strong>
-          <p><code>ffmpeg -i input.mp4 -c copy -movflags faststart output.mp4</code></p>
-          <p>This relocates an existing moov atom; it cannot create a missing one.</p></li>
-      </ol>
-
-      <div class="callout warn">
-        <p><strong>When to stop:</strong> if every command above returns <code>invalid data found</code>, the moov atom doesn't exist. FFmpeg cannot rebuild what was never written — no flag combination changes this. You need reference-based reconstruction.</p>
-      </div>
-
-      <h2>The reference-file method (what actually works)</h2>
-      <p>Tools like <a href="/guides/untrunc-alternative">untrunc</a> take a healthy clip recorded with the same device and settings and use its structure as a template to rebuild the broken file's index — codec parameters, chunk layout, sample tables. See <a href="/guides/repair-mp4-with-reference-file">how reference-file repair works</a> for the full explanation.</p>
-
-      <div class="cta-box">
-        <h3>Reference repair without compiling untrunc</h3>
-        <p>StreamSalvage runs the same FFmpeg stream-copy first, then falls back to reference-guided reconstruction — drag, drop, preview free, $29 only if it works. 100% local.</p>
-        <a class="cta" href="/#download">Download StreamSalvage for Windows</a>
-      </div>
-
+      <p class="eyebrow">Video recovery guide</p>
+      <h1>FFmpeg Invalid Data Found When Processing Input: Fixes</h1>
+      <p class="meta">By Abdul Jabeer Shaik · Updated September 26, 2026</p>
+      <p class="lead"><code>Invalid data found when processing input</code> means FFmpeg could not read the input as expected. The message alone does not prove an MP4 is missing its moov atom. Read the preceding error lines, check the file you supplied, and keep the original before trying a repair.</p>
+      <h2>1. Confirm the input is the video you intended</h2>
+      <ul>
+        <li>Check the path and file size. A 0-byte file contains no media to remux.</li>
+        <li>For a downloaded file, confirm the transfer finished and you did not save an HTML error page with a video extension.</li>
+        <li>If another copy plays, transfer it again. Renaming a file extension does not convert its contents.</li>
+        <li>For a remote URL, try a complete local copy you are authorized to download. An expired link or server response can also cause an input error.</li>
+      </ul>
+      <h2>2. Use ffprobe to inspect the recording</h2>
+      <pre><code>ffprobe -v error -show_format -show_streams "broken.mp4"</code></pre>
+      <p>If this lists audio or video streams, the container is at least partly readable. If it reports <code>moov atom not found</code>, see the <a href="/guides/moov-atom-not-found">missing-moov guide</a>. If you only see a general invalid-data error, check the earlier messages and the source file instead of assuming one specific cause.</p>
+      <h2>3. Remux readable video and audio to a new file</h2>
+      <pre><code>ffmpeg -n -i "broken.mp4" -map 0:v? -map 0:a? -c copy "recovered.mp4"</code></pre>
+      <p>This selects available video and audio streams and copies them without re-encoding. The <code>-n</code> option refuses to overwrite an existing output. MP4 must support the source codecs; if the output reports a codec or container error, that is a separate compatibility problem.</p>
+      <p>Stream copying requires readable input packets. It does not reconstruct an absent index. Check every audio track and the recovered duration afterward. See the <a href="https://www.ffmpeg.org/ffmpeg.html">official FFmpeg documentation</a> for stream selection and stream copying.</p>
+      <h2>Why ignore_err and faststart are not universal repairs</h2>
+      <p>The decoder option <code>-err_detect ignore_err</code> can continue past some decoding errors. A stream copy using <code>-c copy</code> does not decode and re-encode the video, so adding the flag is not a general way to repair damaged frames or missing container metadata.</p>
+      <p><code>-movflags +faststart</code> moves existing MP4 metadata for playback convenience after a successful remux. It cannot create missing source metadata. See <a href="https://www.ffmpeg.org/ffmpeg-all.html">FFmpeg's option reference</a> for the documented limits of error-handling flags.</p>
+      <h2>4. Try a reference only when it fits the failure</h2>
+      <p>For a standard MP4 interrupted while recording, surviving media may be recoverable with a compatible reference clip. Match the recorder, codec, resolution, frame rate, and audio settings. A reference-based tool can attempt reconstruction, but it cannot recreate media that was never written.</p>
+      <p>Read <a href="/guides/repair-mp4-with-reference-file">how reference-file repair works</a> or the <a href="/guides/untrunc-alternative">untrunc guide</a>. For an OBS crash, follow the <a href="/guides/fix-corrupted-obs-recording">OBS recording recovery steps</a>.</p>
+      <div class="cta-box"><h3>Try a guided MP4 repair on Windows</h3><p>StreamSalvage offers local repair attempts and a free preview. Export costs $29 once if you choose to buy. Keep your original, provide a matching reference where available, and inspect the result before purchasing.</p><a class="cta" href="/#download">Try StreamSalvage on Windows</a></div>
       <h2>Frequently asked questions</h2>
       <div class="faq-list">
-        <details>
-          <summary>What does FFmpeg's "invalid data found when processing input" mean?</summary>
-          <p>FFmpeg's demuxer couldn't parse the file: the structure it expected (a valid MP4 header and index) isn't there. On recordings that were interrupted, it almost always means the moov atom was never written, so FFmpeg has no map of the streams.</p>
-        </details>
-        <details>
-          <summary>Can FFmpeg repair an MP4 with a missing moov atom?</summary>
-          <p>No. FFmpeg needs a parseable input; it can't reconstruct a missing index. Flags like <code>-err_detect ignore_err</code> help only when the file is partially readable. For a truly unfinalized MP4 you need a reference-based tool that rebuilds the index from a healthy clip.</p>
-        </details>
-        <details>
-          <summary>Which FFmpeg flags are worth trying on a broken MP4?</summary>
-          <p>Try a plain stream copy first (<code>ffmpeg -i broken.mp4 -c copy out.mp4</code>), then <code>-err_detect ignore_err</code>, and ffprobe to see what's readable. If every command returns "invalid data found when processing input", stop — the container needs rebuilding, not decoding.</p>
-        </details>
-        <details>
-          <summary>What should I use when FFmpeg can't read the file at all?</summary>
-          <p>A reference-file repair tool. It takes a short healthy clip recorded with the same settings and uses its structure to rebuild the broken file's index. untrunc does this on the command line; StreamSalvage does it with a drag-and-drop GUI, free preview, and no upload.</p>
-        </details>
+        <details><summary>What does FFmpeg's invalid data found when processing input mean?</summary><p>FFmpeg could not parse the supplied input as expected. Possible causes include an incomplete file, damaged metadata, the wrong input file, or an unexpected server response. Read the preceding error lines to narrow down the cause.</p></details>
+        <details><summary>Can FFmpeg repair an MP4 with a missing moov atom?</summary><p>A normal FFmpeg remux requires readable input metadata. Stream copy and faststart cannot rebuild a completely missing moov atom. For an interrupted recording with surviving media, a compatible reference-based repair tool may help.</p></details>
+        <details><summary>What should I do if ffprobe reports invalid data?</summary><p>Verify the file path, size, and transfer first, then examine the full error output. If ffprobe lists streams, try a remux on a copy. If it explicitly reports missing MP4 metadata after a recording interruption, consider repair with a matching reference.</p></details>
+        <details><summary>Does err_detect ignore_err fix a corrupt MP4?</summary><p>It can affect how some decoding errors are handled, but it is not a missing-index repair. Stream copying bypasses decoding, and the option cannot create absent media or container metadata.</p></details>
       </div>
 
       <div class="related">
