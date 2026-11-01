@@ -1,6 +1,6 @@
 # StreamSalvage: first links (directory submission kit)
 
-Prepared 2026-10-07. Goal: get streamsalvage.com its first links from other sites (Search Console showed **0 external links**), using only self-serve listings. No cold outreach.
+Prepared 2026-10-07. Updated 2026-11-01 for the signed v1.0.1 release. Goal: get streamsalvage.com its first links from other sites (Search Console showed **0 external links**), using only self-serve listings. No cold outreach.
 
 Brand assets for every listing are in `brand/`:
 - `logo.svg`, `logo-512.png`, `logo-256.png`, `logo-32.png`
@@ -11,7 +11,7 @@ Brand assets for every listing are in `brand/`:
 
 | # | Where | Account? | Link type | Blocked by | Status |
 |---|---|---|---|---|---|
-| 0 | Ship the new icon (site favicon + app icon, release v1.0.1) | none | n/a | none | ☐ |
+| 0 | Ship the new icon (site favicon + app icon, release v1.0.1) | none | n/a | none | ☑ |
 | 1 | GitHub repo: website field + README link | have it | nofollow, but GitHub is crawled constantly | none | ☐ |
 | 2 | AlternativeTo: new listing + "alternative to" untrunc / Stellar / Repairit | yes | reported dofollow* | none (logo upload only) | ☐ |
 | 3 | Softpedia: submission form | form | varies | step 0 (they install and screenshot the app) | ☐ |
@@ -30,14 +30,14 @@ Review times: AlternativeTo "a couple of days up to a week"; Softpedia "up to 30
 
 **Name:** StreamSalvage
 **Website:** https://www.streamsalvage.com/
-**Download (direct):** https://github.com/jabeer4148-ops/StreamSalvage/releases/download/v1.0.0/StreamSalvage_1.0.0_x64-setup.exe
-*(swap in the v1.0.1 URL once released)*
+**Download (direct):** https://github.com/jabeer4148-ops/StreamSalvage/releases/download/v1.0.1/StreamSalvage_1.0.1_x64-setup.exe
+
 **Second download link (Softpedia asks for two):** https://www.streamsalvage.com/#download
-**Version:** 1.0.0 · **Installer:** 46.7 MB, x64 NSIS setup
+**Version:** 1.0.1 · **Installer:** 48.96 MB (46.70 MiB; 48,963,664 bytes), signed x64 NSIS setup
 **OS:** Windows 10 / 11 (64-bit). Uses the Microsoft Edge WebView2 runtime, which is built into Windows 11 and most up-to-date Windows 10.
 **License type:** Trial / Demo (free repair + preview; $29 one-time to export the full file). On AlternativeTo: *Commercial*, with free trial.
 **Price:** $29 one-time, no subscription. Full refund if it doesn't work.
-**Developer:** Abdul Jabeer Shaik · support@streamsalvage.com
+**Developer:** StreamSalvage · support@streamsalvage.com
 **Category:** Multimedia → Video → Video repair / video tools
 **Tags:** video repair, mp4 repair, obs, corrupted video, moov atom, file recovery, screen recording
 
@@ -109,12 +109,12 @@ Draft:
 > I'd like to submit StreamSalvage for review. It's a Windows app that repairs MP4 recordings left unplayable after OBS crashes or power loss, using a reference clip to rebuild the missing moov atom. Processing is fully local.
 >
 > - Website: https://www.streamsalvage.com/
-> - Direct download: [v1.0.1 installer URL]
+> - Direct download: https://github.com/jabeer4148-ops/StreamSalvage/releases/download/v1.0.1/StreamSalvage_1.0.1_x64-setup.exe
 > - License: Demo (free repair and preview; $29 one-time to export)
 > - OS: Windows 10/11 x64
 >
 > Thanks for considering it.
-> Abdul Jabeer Shaik, support@streamsalvage.com
+> StreamSalvage, support@streamsalvage.com
 
 ### Optional: OBS Forums → Resources
 The audience fits best, but check the [Forum Resource and IP Policy](https://obsproject.com/forum/threads/forum-resource-and-ip-policy.195980/) first:
