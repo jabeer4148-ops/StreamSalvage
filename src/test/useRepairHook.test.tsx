@@ -18,6 +18,7 @@ vi.mock('../lib/tauriCommands', () => ({
   clearStoredLicense: vi.fn(),
   openFileInPlayer: vi.fn(),
   saveRepairedFile: vi.fn(),
+  cleanupWorkFiles: vi.fn(),
 }));
 
 import { useRepair } from '../hooks/useRepair';
@@ -38,6 +39,7 @@ const mockSaveFile = vi.mocked(cmd.saveRepairedFile);
 const SUCCESS_RESULT = {
   success: true,
   output_path: 'fixed.mp4',
+  preview_path: 'fixed_preview.mp4',
   log: ['done'],
   error: null,
 };
@@ -45,6 +47,7 @@ const SUCCESS_RESULT = {
 const FAILURE_RESULT = {
   success: false,
   output_path: null,
+  preview_path: null,
   log: ['FFmpeg failed'],
   error: 'FFmpeg stream copy could not recover this file.',
 };
@@ -330,7 +333,7 @@ describe('useRepair hook', () => {
 
   // ── previewFile ───────────────────────────────────────────────────────
 
-  test('previewFile: calls openFileInPlayer with repairedFilePath', async () => {
+  test('previewFile: opens the preview clip, never the full repaired file', async () => {
     mockPickBroken.mockResolvedValue('broken.mp4');
     mockRepairNoRef.mockResolvedValue(SUCCESS_RESULT);
     mockOpenPlayer.mockResolvedValue(undefined);
@@ -351,7 +354,8 @@ describe('useRepair hook', () => {
       await result.current.previewFile();
     });
 
-    expect(mockOpenPlayer).toHaveBeenCalledWith('fixed.mp4');
+    expect(mockOpenPlayer).toHaveBeenCalledWith('fixed_preview.mp4');
+    expect(mockOpenPlayer).not.toHaveBeenCalledWith('fixed.mp4');
   });
 
   test('previewFile: does nothing if repairedFilePath is null', async () => {

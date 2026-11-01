@@ -1,6 +1,6 @@
 [package]
 name = "streamsalvage"
-version = "1.0.0"
+version = "1.0.1"
 description = "StreamSalvage desktop MP4 repair app"
 authors = ["you"]
 edition = "2021"

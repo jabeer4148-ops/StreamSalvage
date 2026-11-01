@@ -1,10 +1,17 @@
 interface Props {
   repairedFilePath: string | null;
+  /** 30-second clip cut from the repaired file. null = FFmpeg could not cut one. */
+  previewFilePath: string | null;
   onPlayInPlayer: () => void;
   onProceedToExport: () => void;
 }
 
-export function VideoPreview({ repairedFilePath, onPlayInPlayer, onProceedToExport }: Props) {
+export function VideoPreview({
+  repairedFilePath,
+  previewFilePath,
+  onPlayInPlayer,
+  onProceedToExport,
+}: Props) {
   if (!repairedFilePath) {
     return (
       <div className="text-center py-8">
@@ -43,20 +50,29 @@ export function VideoPreview({ repairedFilePath, onPlayInPlayer, onProceedToExpo
           </span>
         </div>
         <div className="bg-neutral-900 h-28 flex items-center justify-center">
-          <button
-            onClick={onPlayInPlayer}
-            className="flex flex-col items-center gap-2 text-white opacity-80 hover:opacity-100 transition-opacity"
-            aria-label="Play preview in system media player"
-          >
-            <div className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-xs font-semibold">
-              Play
-            </div>
-            <span className="text-xs text-white/70">Open in media player</span>
-          </button>
+          {previewFilePath ? (
+            <button
+              onClick={onPlayInPlayer}
+              className="flex flex-col items-center gap-2 text-white opacity-80 hover:opacity-100 transition-opacity"
+              aria-label="Play preview in system media player"
+            >
+              <div className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-xs font-semibold">
+                Play
+              </div>
+              <span className="text-xs text-white/70">Open in media player</span>
+            </button>
+          ) : (
+            <p className="text-xs text-white/70 text-center px-6">
+              Preview clip could not be created for this file. The repair itself succeeded;
+              remember you get a full refund if the exported video does not play.
+            </p>
+          )}
         </div>
       </div>
 
-      <p className="text-xs text-neutral-400 text-center mb-3 truncate">Saved to: {fileName}</p>
+      <p className="text-xs text-neutral-400 text-center mb-3 truncate">
+        Recovered as {fileName} · full file unlocks on export
+      </p>
 
       <button
         onClick={onProceedToExport}

@@ -140,7 +140,7 @@ describe('useRepair reducer', () => {
     state = reducer(state, { type: 'REPAIR_PROGRESS', progress: 60, log: 'Working...' });
     const next = reducer(state, {
       type: 'REPAIR_SUCCESS',
-      outputPath: 'fixed.mp4',
+      outputPath: 'fixed.mp4', previewPath: 'fixed_preview.mp4',
       log: ['FFmpeg done'],
     });
     expect(next.step).toBe('preview');
@@ -234,7 +234,7 @@ describe('useRepair reducer', () => {
     state = reducer(state, { type: 'START_REPAIR' });
     state = reducer(state, {
       type: 'REPAIR_SUCCESS',
-      outputPath: 'fixed.mp4',
+      outputPath: 'fixed.mp4', previewPath: 'fixed_preview.mp4',
       log: ['done'],
     });
     state = reducer(state, { type: 'LICENSE_VALID', key: 'TEST-XXXX' });
@@ -260,7 +260,7 @@ describe('useRepair reducer', () => {
     // Simulated stale async result arriving after reset
     const stale = reducer(state, {
       type: 'REPAIR_SUCCESS',
-      outputPath: 'stale.mp4',
+      outputPath: 'stale.mp4', previewPath: 'stale_preview.mp4',
       log: [],
     });
     // The reducer has no concept of run IDs; it applies the action.

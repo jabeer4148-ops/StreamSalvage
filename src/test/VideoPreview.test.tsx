@@ -10,14 +10,14 @@ describe('VideoPreview', () => {
 
   test('shows error message when repairedFilePath is null', () => {
     render(
-      <VideoPreview repairedFilePath={null} onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath={null} previewFilePath={null} onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByText(/output file path is missing/i)).toBeInTheDocument();
   });
 
   test('does not show play button when repairedFilePath is null', () => {
     render(
-      <VideoPreview repairedFilePath={null} onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath={null} previewFilePath={null} onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.queryByLabelText(/play preview/i)).not.toBeInTheDocument();
   });
@@ -26,28 +26,28 @@ describe('VideoPreview', () => {
 
   test('shows "Repair successful" banner with valid path', () => {
     render(
-      <VideoPreview repairedFilePath="C:\\fixed.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath="C:\\fixed.mp4" previewFilePath="C:\\fixed_preview.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByText('Repair successful')).toBeInTheDocument();
   });
 
   test('shows play button with valid path', () => {
     render(
-      <VideoPreview repairedFilePath="C:\\fixed.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath="C:\\fixed.mp4" previewFilePath="C:\\fixed_preview.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByLabelText(/play preview in system media player/i)).toBeInTheDocument();
   });
 
   test('shows "Unlock full video" CTA with price', () => {
     render(
-      <VideoPreview repairedFilePath="C:\\fixed.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath="C:\\fixed.mp4" previewFilePath="C:\\fixed_preview.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByText(/Unlock full video.*\$29/)).toBeInTheDocument();
   });
 
   test('shows free preview label', () => {
     render(
-      <VideoPreview repairedFilePath="C:\\fixed.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath="C:\\fixed.mp4" previewFilePath="C:\\fixed_preview.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByText(/Free preview/i)).toBeInTheDocument();
     expect(screen.getByText(/Full video locked/i)).toBeInTheDocument();
@@ -55,9 +55,37 @@ describe('VideoPreview', () => {
 
   test('shows trust copy about no subscription', () => {
     render(
-      <VideoPreview repairedFilePath="C:\\fixed.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
+      <VideoPreview repairedFilePath="C:\\fixed.mp4" previewFilePath="C:\\fixed_preview.mp4" onPlayInPlayer={noop} onProceedToExport={noop} />,
     );
     expect(screen.getByText(/No subscription/i)).toBeInTheDocument();
+  });
+
+  // ── Missing preview clip ──────────────────────────────────────────────
+
+  test('hides play button and explains when previewFilePath is null', () => {
+    render(
+      <VideoPreview
+        repairedFilePath="C:\\fixed.mp4"
+        previewFilePath={null}
+        onPlayInPlayer={noop}
+        onProceedToExport={noop}
+      />,
+    );
+    expect(screen.queryByLabelText(/play preview/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Preview clip could not be created/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Unlock full video/i })).toBeInTheDocument();
+  });
+
+  test('never shows a "Saved to" location for the full file', () => {
+    render(
+      <VideoPreview
+        repairedFilePath="C:\\fixed.mp4"
+        previewFilePath="C:\\fixed_preview.mp4"
+        onPlayInPlayer={noop}
+        onProceedToExport={noop}
+      />,
+    );
+    expect(screen.queryByText(/Saved to/i)).not.toBeInTheDocument();
   });
 
   // ── Filename display ──────────────────────────────────────────────────
@@ -66,6 +94,7 @@ describe('VideoPreview', () => {
     render(
       <VideoPreview
         repairedFilePath="C:\\long\\path\\to\\stream_recovered.mp4"
+        previewFilePath="C:\\long\\path\\to\\stream_recovered_preview.mp4"
         onPlayInPlayer={noop}
         onProceedToExport={noop}
       />,
@@ -78,6 +107,7 @@ describe('VideoPreview', () => {
     render(
       <VideoPreview
         repairedFilePath="/home/user/videos/stream_recovered.mp4"
+        previewFilePath="/home/user/videos/stream_recovered_preview.mp4"
         onPlayInPlayer={noop}
         onProceedToExport={noop}
       />,
@@ -94,6 +124,7 @@ describe('VideoPreview', () => {
     render(
       <VideoPreview
         repairedFilePath="C:\\fixed.mp4"
+        previewFilePath="C:\\fixed_preview.mp4"
         onPlayInPlayer={mockPlay}
         onProceedToExport={noop}
       />,
@@ -108,6 +139,7 @@ describe('VideoPreview', () => {
     render(
       <VideoPreview
         repairedFilePath="C:\\fixed.mp4"
+        previewFilePath="C:\\fixed_preview.mp4"
         onPlayInPlayer={noop}
         onProceedToExport={mockExport}
       />,
@@ -123,6 +155,7 @@ describe('VideoPreview', () => {
     render(
       <VideoPreview
         repairedFilePath="C:\\fixed.mp4"
+        previewFilePath="C:\\fixed_preview.mp4"
         onPlayInPlayer={mockPlay}
         onProceedToExport={mockExport}
       />,

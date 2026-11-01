@@ -12,6 +12,7 @@ import {
   clearStoredLicense,
   openFileInPlayer,
   saveRepairedFile,
+  cleanupWorkFiles,
 } from '../lib/tauriCommands';
 
 export type Action =
@@ -21,7 +22,7 @@ export type Action =
   | { type: 'UNDO_SKIP' }
   | { type: 'START_REPAIR' }
   | { type: 'REPAIR_PROGRESS'; progress: number; log?: string }
-  | { type: 'REPAIR_SUCCESS'; outputPath: string; log: string[] }
+  | { type: 'REPAIR_SUCCESS'; outputPath: string; previewPath: string | null; log: string[] }
   | { type: 'REPAIR_FAILED'; error: string; log: string[] }
   | { type: 'SHOW_EXPORT' }
   | { type: 'LICENSE_VALID'; key: string }
@@ -39,6 +40,7 @@ export const initialState: RepairState = {
   repairProgress: 0,
   repairLog: [],
   repairedFilePath: null,
+  previewFilePath: null,
   repairSuccess: false,
   repairError: null,
   licenseKey: null,
@@ -89,6 +91,7 @@ export function reducer(state: RepairState, action: Action): RepairState {
         step: 'preview',
         repairSuccess: true,
         repairedFilePath: action.outputPath,
+        previewFilePath: action.previewPath,
         repairLog: [...state.repairLog, ...action.log],
         repairProgress: 100,
         repairError: null,
@@ -233,7 +236,12 @@ export function useRepair() {
       if (repairRunIdRef.current !== repairRunId) return;
 
       if (result.success && result.output_path) {
-        dispatch({ type: 'REPAIR_SUCCESS', outputPath: result.output_path, log: result.log });
+        dispatch({
+          type: 'REPAIR_SUCCESS',
+          outputPath: result.output_path,
+          previewPath: result.preview_path ?? null,
+          log: result.log,
+        });
       } else {
         dispatch({
           type: 'REPAIR_FAILED',
@@ -301,20 +309,23 @@ export function useRepair() {
     }
   }, [state.repairedFilePath]);
 
+  // Only ever opens the 30-second preview clip. The full repaired file stays
+  // in the app's private work folder until the user exports with a license.
   const previewFile = useCallback(async () => {
-    if (!state.repairedFilePath) return;
+    if (!state.previewFilePath) return;
 
     try {
-      await openFileInPlayer(state.repairedFilePath);
+      await openFileInPlayer(state.previewFilePath);
     } catch (err) {
       console.error('Preview open failed:', err);
     }
-  }, [state.repairedFilePath]);
+  }, [state.previewFilePath]);
 
   const reset = useCallback(() => {
     repairRunIdRef.current += 1;
     stopProgressTimer();
     dispatch({ type: 'RESET' });
+    void cleanupWorkFiles();
   }, [stopProgressTimer]);
 
   return {

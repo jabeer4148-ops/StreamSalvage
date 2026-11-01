@@ -52,6 +52,7 @@ export async function repairNoReference(brokenPath: string): Promise<TauriRepair
     return {
       success: false,
       output_path: null,
+      preview_path: null,
       log: [String(err)],
       error: String(err),
     };
@@ -69,6 +70,7 @@ export async function repairWithReference(
     return {
       success: false,
       output_path: null,
+      preview_path: null,
       log: [String(err)],
       error: String(err),
     };
@@ -114,6 +116,14 @@ export async function openFileInPlayer(path: string): Promise<void> {
     await invoke('open_file_in_player', { path });
   } catch (err) {
     console.error('open_file_in_player failed:', err);
+  }
+}
+
+export async function cleanupWorkFiles(): Promise<void> {
+  try {
+    await invoke('cleanup_work_files');
+  } catch (err) {
+    console.error('cleanup_work_files failed:', err);
   }
 }
 

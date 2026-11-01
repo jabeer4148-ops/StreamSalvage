@@ -9,6 +9,7 @@ export interface RepairState {
   repairProgress: number;
   repairLog: string[];
   repairedFilePath: string | null;
+  previewFilePath: string | null;
   repairSuccess: boolean;
   repairError: string | null;
   licenseKey: string | null;
@@ -19,6 +20,7 @@ export interface RepairState {
 export interface TauriRepairResult {
   success: boolean;
   output_path: string | null;
+  preview_path: string | null;
   log: string[];
   error: string | null;
 }

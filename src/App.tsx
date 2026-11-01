@@ -134,6 +134,7 @@ export default function App() {
         <section>
           <VideoPreview
             repairedFilePath={state.repairedFilePath}
+            previewFilePath={state.previewFilePath}
             onPlayInPlayer={previewFile}
             onProceedToExport={showExport}
           />

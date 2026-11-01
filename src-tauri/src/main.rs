@@ -9,6 +9,10 @@ use tauri::Manager;
 pub struct RepairResult {
     pub success: bool,
     pub output_path: Option<String>,
+    /// 30-second preview clip the user may watch before buying. The full
+    /// repaired file lives in the private work folder and is only copied out
+    /// by `save_repaired_file` after license validation.
+    pub preview_path: Option<String>,
     pub log: Vec<String>,
     pub error: Option<String>,
 }
@@ -152,9 +156,76 @@ fn is_valid_video_extension(path: &str) -> bool {
     matches!(ext.as_str(), "mp4" | "mov" | "m4v")
 }
 
-fn generate_output_path(input: &Path) -> PathBuf {
+/// Private working folder for repaired files. The full repaired recording is
+/// written here (never next to the user's broken file) so the free preview is
+/// really a preview and the $29 export is what delivers the full file.
+fn work_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let base = app
+        .path()
+        .app_local_data_dir()
+        .unwrap_or_else(|_| std::env::temp_dir().join("StreamSalvage"));
+    let dir = base.join("work");
+    std::fs::create_dir_all(&dir)
+        .map_err(|e| format!("Could not create working folder {}: {}", dir.display(), e))?;
+    Ok(dir)
+}
+
+/// Remove every file in the work folder (leftover full repairs and previews).
+fn clear_work_dir(dir: &Path) -> Result<(), String> {
+    if !dir.exists() {
+        return Ok(());
+    }
+    let entries = std::fs::read_dir(dir).map_err(|e| format!("Could not read work folder: {}", e))?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() {
+            let _ = std::fs::remove_file(&path);
+        }
+    }
+    Ok(())
+}
+
+/// Cut a 30-second, stream-copied preview of a repaired file. Returns None if
+/// FFmpeg could not produce one; the repair itself is still a success.
+fn make_preview(ffmpeg: &Path, repaired: &Path, log: &mut Vec<String>) -> Option<PathBuf> {
+    let stem = repaired.file_stem().unwrap_or_default().to_string_lossy();
+    let preview = repaired.with_file_name(format!("{}_preview.mp4", stem));
+    log.push("Creating 30-second preview...".to_string());
+    let result = Command::new(ffmpeg)
+        .args([
+            "-y",
+            "-i",
+            repaired.to_str().unwrap_or_default(),
+            "-t",
+            "30",
+            "-c",
+            "copy",
+            "-avoid_negative_ts",
+            "make_zero",
+            "-movflags",
+            "+faststart",
+            preview.to_str().unwrap_or_default(),
+        ])
+        .output();
+    match result {
+        Ok(out) if out.status.success() && output_is_valid(&preview) => Some(preview),
+        Ok(out) => {
+            log.push(format!(
+                "Preview generation failed: {}",
+                String::from_utf8_lossy(&out.stderr).trim()
+            ));
+            None
+        }
+        Err(e) => {
+            log.push(format!("Preview generation failed: {}", e));
+            None
+        }
+    }
+}
+
+fn generate_output_path(input: &Path, work_dir: &Path) -> PathBuf {
     let stem = input.file_stem().unwrap_or_default().to_string_lossy();
-    let dir = input.parent().unwrap_or(Path::new("."));
+    let dir = work_dir;
     let base = dir.join(format!("{}_recovered.mp4", stem));
     if !base.exists() {
         return base;
@@ -184,6 +255,7 @@ async fn repair_no_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some("File not found".to_string()),
         });
@@ -194,6 +266,7 @@ async fn repair_no_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "Unsupported file type. Only .mp4, .mov, and .m4v files are supported.".to_string(),
@@ -208,6 +281,7 @@ async fn repair_no_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "File too small to be a valid recording (under 1MB). Are you sure this is the right file?"
@@ -219,7 +293,8 @@ async fn repair_no_reference(
     let ffmpeg = get_ffmpeg_path(&app)?;
     log.push(format!("FFmpeg path resolved: {}", ffmpeg.display()));
     log.push(format!("FFmpeg exists: {}", ffmpeg.exists()));
-    let output = generate_output_path(Path::new(&broken_path));
+    let work = work_dir(&app)?;
+    let output = generate_output_path(Path::new(&broken_path), &work);
 
     let result = Command::new(&ffmpeg)
         .args([
@@ -240,9 +315,11 @@ async fn repair_no_reference(
 
     if result.status.success() && output_is_valid(&output) {
         log.push("Recovery successful.".to_string());
+        let preview = make_preview(&ffmpeg, &output, &mut log);
         Ok(RepairResult {
             success: true,
             output_path: Some(output.to_string_lossy().to_string()),
+            preview_path: preview.as_ref().map(|p| p.to_string_lossy().to_string()),
             log,
             error: None,
         })
@@ -253,6 +330,7 @@ async fn repair_no_reference(
         Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some("FFmpeg stream copy could not recover this file.".to_string()),
         })
@@ -275,6 +353,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some("File not found".to_string()),
         });
@@ -285,6 +364,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some("Reference file not found".to_string()),
         });
@@ -295,6 +375,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some("Broken file and reference file cannot be the same file.".to_string()),
         });
@@ -305,6 +386,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "Unsupported file type. Only .mp4, .mov, and .m4v files are supported.".to_string(),
@@ -317,6 +399,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "Unsupported reference file type. Only .mp4, .mov, and .m4v files are supported."
@@ -332,6 +415,7 @@ async fn repair_with_reference(
         return Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "File too small to be a valid recording (under 1MB). Are you sure this is the right file?"
@@ -343,7 +427,8 @@ async fn repair_with_reference(
     let ffmpeg = get_ffmpeg_path(&app)?;
     log.push(format!("FFmpeg path resolved: {}", ffmpeg.display()));
     log.push(format!("FFmpeg exists: {}", ffmpeg.exists()));
-    let output = generate_output_path(Path::new(&broken_path));
+    let work = work_dir(&app)?;
+    let output = generate_output_path(Path::new(&broken_path), &work);
 
     // Step 1: try direct stream copy first (fastest)
     log.push("Step 1/3: Attempting stream copy...".to_string());
@@ -370,9 +455,11 @@ async fn repair_with_reference(
 
     if step1.status.success() && output_is_valid(&output) {
         log.push("Stream copy succeeded.".to_string());
+        let preview = make_preview(&ffmpeg, &output, &mut log);
         return Ok(RepairResult {
             success: true,
             output_path: Some(output.to_string_lossy().to_string()),
+            preview_path: preview.as_ref().map(|p| p.to_string_lossy().to_string()),
             log,
             error: None,
         });
@@ -409,9 +496,11 @@ async fn repair_with_reference(
 
     if step2.status.success() && output_is_valid(&output) {
         log.push("Reference remap succeeded.".to_string());
+        let preview = make_preview(&ffmpeg, &output, &mut log);
         return Ok(RepairResult {
             success: true,
             output_path: Some(output.to_string_lossy().to_string()),
+            preview_path: preview.as_ref().map(|p| p.to_string_lossy().to_string()),
             log,
             error: None,
         });
@@ -450,9 +539,11 @@ async fn repair_with_reference(
 
     if step3.status.success() && output_is_valid(&output) {
         log.push("Fallback recovery succeeded.".to_string());
+        let preview = make_preview(&ffmpeg, &output, &mut log);
         Ok(RepairResult {
             success: true,
             output_path: Some(output.to_string_lossy().to_string()),
+            preview_path: preview.as_ref().map(|p| p.to_string_lossy().to_string()),
             log,
             error: None,
         })
@@ -460,6 +551,7 @@ async fn repair_with_reference(
         Ok(RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log,
             error: Some(
                 "Could not reconstruct file. The recording may be too severely corrupted."
@@ -541,18 +633,47 @@ async fn open_file_in_player(path: String) -> Result<(), String> {
     Ok(())
 }
 
-/// Save repaired file to user-chosen location
+/// Save repaired file to user-chosen location. Requires a validated license
+/// on this PC (written only by `save_stored_license` after a successful
+/// server check), so the full file cannot be exported without a purchase.
 #[tauri::command]
-async fn save_repaired_file(source_path: String, destination_path: String) -> Result<(), String> {
+async fn save_repaired_file(
+    app: tauri::AppHandle,
+    source_path: String,
+    destination_path: String,
+) -> Result<(), String> {
+    let license_path = license_file_path(&app)?;
+    if read_license_file(&license_path)?.is_none() {
+        return Err("A valid license is required to export the full file.".to_string());
+    }
+    let work = work_dir(&app)?;
+    let source = Path::new(&source_path);
+    if !source.starts_with(&work) {
+        return Err("Export source must be a repaired file from this session.".to_string());
+    }
     std::fs::copy(&source_path, &destination_path)
         .map(|_| ())
         .map_err(|e| format!("Copy failed: {}", e))
+}
+
+/// Delete leftover repaired files and previews from the private work folder.
+#[tauri::command]
+async fn cleanup_work_files(app: tauri::AppHandle) -> Result<(), String> {
+    let work = work_dir(&app)?;
+    clear_work_dir(&work)
 }
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
+        .setup(|app| {
+            // Purge anything left from a previous run (crash, force-close).
+            if let Ok(work) = work_dir(app.handle()) {
+                let _ = clear_work_dir(&work);
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             repair_no_reference,
             repair_with_reference,
@@ -562,6 +683,7 @@ fn main() {
             clear_stored_license,
             open_file_in_player,
             save_repaired_file,
+            cleanup_work_files,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -611,6 +733,7 @@ mod tests {
         let result = RepairResult {
             success: true,
             output_path: Some("test.mp4".to_string()),
+            preview_path: None,
             log: vec![],
             error: None,
         };
@@ -628,6 +751,7 @@ mod tests {
         let result = RepairResult {
             success: false,
             output_path: None,
+            preview_path: None,
             log: vec![],
             error: Some("file not found".to_string()),
         };
@@ -647,6 +771,7 @@ mod tests {
         let result = RepairResult {
             success: true,
             output_path: None,
+            preview_path: None,
             log: entries.clone(),
             error: None,
         };
@@ -800,7 +925,7 @@ mod tests {
     #[test]
     fn test_output_path_has_recovered_suffix() {
         // Path doesn't exist → returns base (no collision branch taken)
-        let output = generate_output_path(Path::new("C:\\recordings\\stream.mp4"));
+        let output = generate_output_path(Path::new("C:\\recordings\\stream.mp4"), Path::new("C:\\work"));
         let filename = output.file_name().unwrap().to_string_lossy();
         assert!(
             filename.ends_with("_recovered.mp4"),
@@ -811,20 +936,20 @@ mod tests {
     }
 
     #[test]
-    fn test_output_path_same_directory_as_input() {
-        let output = generate_output_path(Path::new("C:\\recordings\\stream.mp4"));
+    fn test_output_path_in_work_dir_not_next_to_input() {
+        let output = generate_output_path(Path::new("C:\\recordings\\stream.mp4"), Path::new("C:\\work"));
         let parent = output.parent().unwrap().to_string_lossy();
         assert!(
-            parent.contains("recordings"),
-            "output should be in same dir as input, got parent: {}",
+            parent.ends_with("work") && !parent.contains("recordings"),
+            "output must live in the private work dir, got parent: {}",
             parent
         );
     }
 
     #[test]
     fn test_output_path_deterministic_when_no_collision() {
-        let output1 = generate_output_path(Path::new("/tmp/stream.mp4"));
-        let output2 = generate_output_path(Path::new("/tmp/stream.mp4"));
+        let output1 = generate_output_path(Path::new("/tmp/stream.mp4"), Path::new("/tmp"));
+        let output2 = generate_output_path(Path::new("/tmp/stream.mp4"), Path::new("/tmp"));
         assert_eq!(
             output1, output2,
             "same input → same output when no collision"
@@ -837,7 +962,7 @@ mod tests {
         let input_path = dir.path().join("stream.mp4");
 
         // First call: no existing file → returns base
-        let first = generate_output_path(&input_path);
+        let first = generate_output_path(&input_path, dir.path());
         let first_name = first.file_name().unwrap().to_string_lossy();
         assert!(
             first_name.ends_with("_recovered.mp4"),
@@ -849,7 +974,7 @@ mod tests {
         std::fs::write(&first, b"dummy").unwrap();
 
         // Second call: base exists → returns _recovered_2.mp4
-        let second = generate_output_path(&input_path);
+        let second = generate_output_path(&input_path, dir.path());
         let second_name = second.file_name().unwrap().to_string_lossy();
         assert!(
             second_name.contains("_recovered_2"),
@@ -865,11 +990,11 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let input_path = dir.path().join("stream.mp4");
 
-        let first = generate_output_path(&input_path);
+        let first = generate_output_path(&input_path, dir.path());
         std::fs::write(&first, b"v1").unwrap();
-        let second = generate_output_path(&input_path);
+        let second = generate_output_path(&input_path, dir.path());
         std::fs::write(&second, b"v2").unwrap();
-        let third = generate_output_path(&input_path);
+        let third = generate_output_path(&input_path, dir.path());
 
         let third_name = third.file_name().unwrap().to_string_lossy();
         assert!(
@@ -881,7 +1006,7 @@ mod tests {
 
     #[test]
     fn test_output_path_handles_unicode_filename() {
-        let output = generate_output_path(Path::new("/tmp/\u{8996}\u{983C}_recording.mp4"));
+        let output = generate_output_path(Path::new("/tmp/\u{8996}\u{983C}_recording.mp4"), Path::new("/tmp"));
         let filename = output.file_name().unwrap().to_string_lossy();
         assert!(
             filename.contains("_recovered.mp4"),
@@ -892,7 +1017,7 @@ mod tests {
 
     #[test]
     fn test_output_path_preserves_stem_with_dots() {
-        let output = generate_output_path(Path::new("/tmp/my.stream.2024.mp4"));
+        let output = generate_output_path(Path::new("/tmp/my.stream.2024.mp4"), Path::new("/tmp"));
         let filename = output.file_name().unwrap().to_string_lossy();
         assert_eq!(filename, "my.stream.2024_recovered.mp4");
     }

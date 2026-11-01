@@ -19,7 +19,7 @@ src/                      React frontend
     VideoPreview.tsx       Preview repaired output
     ExportPanel.tsx        Save + license validation UI
 
-src-tauri/src/main.rs     Rust backend — all 8 Tauri commands
+src-tauri/src/main.rs     Rust backend — all 9 Tauri commands
 src-tauri/tauri.conf.json App config (780×620 fixed window, ffmpeg sidecar)
 ```
 
@@ -38,13 +38,14 @@ src-tauri/tauri.conf.json App config (780×620 fixed window, ffmpeg sidecar)
 | `repair_with_reference` | 3-step reference-guided repair |
 | `validate_license` | POST `{ licenseKey }` to `https://streamsalvage.com/api/validate-license` |
 | `get_stored_license` / `save_stored_license` / `clear_stored_license` | Read / write / delete `%APPDATA%\StreamSalvage\license.json` |
-| `open_file_in_player` | `cmd /c start` on Windows |
-| `save_repaired_file` | `std::fs::copy` to user destination |
+| `open_file_in_player` | `cmd /c start` on Windows (the UI only ever passes the 30 s preview clip) |
+| `save_repaired_file` | `std::fs::copy` from the work folder to the user's destination; refuses without a stored license |
+| `cleanup_work_files` | Empties the private work folder (called on reset and at app start) |
 
 ### Key notes
 
 - Payments: Stripe Checkout from the landing site (`landing/pages/api/create-checkout.js`). The Stripe webhook (`api/webhook.js`) generates a `SS-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX` key, stores it in Upstash Redis and emails it via Brevo. The app validates keys against `api/validate-license.js`. No payment secrets are compiled into the app; `STREAMSALVAGE_LICENSE_API_URL` (build time) can override the endpoint. Debug builds without it accept any `TEST-` key.
-- Output file is written next to the broken file as `{stem}_recovered.mp4`.
+- Repairs are written to the private work folder (`app_local_data_dir()/work/{stem}_recovered.mp4`), never next to the broken file. On success FFmpeg also cuts `{stem}_recovered_preview.mp4` (`-t 30 -c copy`); that clip is the free preview. The full file only reaches the user via `save_repaired_file` after license validation. This is the paywall — do not reintroduce writing next to the input.
 - Progress bar during repair is simulated (90% over 3 s); jumps to 100% on success.
 
 ## graphify
